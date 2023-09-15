@@ -29,6 +29,14 @@ typedef struct {
 
 } S_BTN_Descriptor;
 
+//structure de la valeur des boutons
+typedef struct {
+            uint8_t Up : 1;             // événement incrément
+            uint8_t Down : 1;             // événement décrément
+
+
+} S_SW_Descriptor;
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Prototypes
@@ -36,7 +44,7 @@ typedef struct {
 // *****************************************************************************
 //---------------------------------------------------------------------------------	
 // Fonction ScanBTN: Lecture de la valeurs des boutons
-void ScanBTN (bool BTN_Plus, bool BTN_Moins, bool BTN_OK);
+void ScanBTN (bool BTN_Plus, bool BTN_Moins, bool BTN_OK,bool SW_UP, bool SW_Down );
 //---------------------------------------------------------------------------------	
 // Fonction BoutonInit: Initialisation de la valeur des boutons
 void BoutonInit (void);
@@ -50,6 +58,12 @@ bool BoutonMinus    (void);
 // Fonction BoutonIsOK: Indique la valeur du bouton OK
 bool BoutonIsOK    (void);
 //---------------------------------------------------------------------------------	
+// Fonction BoutonIsOK: Indique la valeur du bouton OK
+bool SwitchUp     (void);
+//---------------------------------------------------------------------------------	
+// Fonction BoutonIsOK: Indique la valeur du bouton OK
+bool SwitchDown    (void);
+//---------------------------------------------------------------------------------	
 // Fonction BoutonClearPlus: Clear valeur bouton incrémentation
 void BoutonClearPlus   (void);
 //---------------------------------------------------------------------------------	
@@ -58,6 +72,12 @@ void BoutonClearMinus   (void);
 //---------------------------------------------------------------------------------	
 // Fonction BoutonClearOK: Clear valeur bouton OK
 void BoutonClearOK   (void);
+//---------------------------------------------------------------------------------	
+// Fonction BoutonClearMinus: Clear valeur bouton décrémentation
+void SwitchClearUp   (void);
+//---------------------------------------------------------------------------------	
+// Fonction BoutonClearOK: Clear valeur bouton OK
+void SwitchClearDown   (void);
 
 
 #endif

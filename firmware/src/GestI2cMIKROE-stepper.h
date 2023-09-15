@@ -19,6 +19,7 @@
 #include <stdint.h>
 #include "GesMoteur.h"
 #include "Mc32_I2cUtilCCS.h"
+#include "Mc32Delays.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -34,7 +35,8 @@
 #define PCA9538A_pt_Output  0x01        // adr. registre output port
 #define PCA9538A_pt_Config  0x03        // adr. registre configuration port
 
-#define PCA9538A_Config_OUTput 0xFF
+#define PCA9538A_OutputInitValue 0x46
+#define PCA9538A_ConfigInitValue 0x00
 
 #define I2C_M1  I2C_ID_4 //ID 1
 #define I2C_M2  I2C_ID_1 //ID 2

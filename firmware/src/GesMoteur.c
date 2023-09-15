@@ -35,18 +35,19 @@ void INIT_MOTEUR(void)
     //éteindre le ventillateur et la LED
     OnOff_VentilETLED(0);
     
-    INB1_M3On();
-    INB1_M2On();
-    INB1_M1On();
-    
-    INB2_M3On();
-    INB2_M2On();
-    INB2_M1On();
-    
+    //activer les Input pour faire tourner le moteur
+    //Moteur 3
     INA1_M3On();
+    INB1_M3On();
+    INB2_M3On();
+    //moteur 2
     INA1_M2On();
-    INA1_M1On();
-    
+    INB1_M2On();
+    INB2_M2On();
+    //Moteur 1 
+    INA1_M1On(); 
+    INB1_M1On();
+    INB2_M1On();
 }
 
 
@@ -66,12 +67,16 @@ void Mode_Normal(void)
     //varible compteur de step
     uint8_t Nbr_Step_M2 = 0;
     uint8_t Nbr_Step_M1 = 0;
+    
+    static int i;
+    
+    uint8_t Step_Positif[4] = {0x46, 0x44, 0x40, 0x42}; //moteur tourne dans le sens horaire
 
     switch(Val_Mode_Moteur)
     {
         case STATE_MOTEUR_M3:
             //Si le capteur de fin course du haut est actif 
-            if(FinCourse_UpStateGet())
+            if(SwitchUp())
             {
                 //Changer d'état (faire tourner le moteur M2)
                 Val_Mode_Moteur = STATE_MOTEUR_M2;
@@ -79,8 +84,17 @@ void Mode_Normal(void)
             //sinon faire tourner le moteur 
             else 
             {
-                //envoie des data pour avancer d'un step
-                I2C_WriteGPIO_PCA95( ID_I2C_M(Moteur_3) , Step_Positif, 4);
+                
+                if(i == 4)
+                {
+                    i = 0;
+                }
+                else
+                {
+                    I2C_WriteGPIO_UnData_PCA95(ID_I2C_M(Moteur_3), Step_Positif[i]);
+                    i++;
+                    delay_ms(10);
+                }             
             }
   
         break;
@@ -159,6 +173,8 @@ void Mode_Normal(void)
             
         break;   
     }
+    SwitchClearDown();
+    SwitchClearUp();
 }
 
 //---------------------------------------------------------------------------------	

@@ -78,7 +78,7 @@ void __ISR(_TIMER_1_VECTOR, ipl3AUTO) IntHandlerDrvTmrInstance0(void)
     static uint16_t Compteur_Service_Tasks= 0; 
     
     //lire la valeur des boutons
-    ScanBTN (BTN_PlusStateGet(), BTN_MoinsStateGet(), BTN_OKStateGet());
+    ScanBTN (BTN_PlusStateGet(), BTN_MoinsStateGet(), BTN_OKStateGet(),FinCourse_UpStateGet(),FinCourse_DownStateGet());
     //entrer dans le l'etat service task toute les 10ms (Machine d'état app.c)
     if (Compteur_Service_Tasks >= 10)
     {   

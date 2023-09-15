@@ -150,8 +150,6 @@ void APP_Tasks ( void )
             INIT_MOTEUR();			
             //initialisation des boutons
             BoutonInit();
- 
-            
             // Activer les timers 
             DRV_TMR0_Start();
             DRV_TMR1_Start();
@@ -178,14 +176,8 @@ void APP_Tasks ( void )
             //toggle la LED à chaque fois qui entre dans service task
             LED_TestToggle();
             //Fonction permettant le choix du mode de fonctionnement 
-            //GEST_Mode();
-            
-            //envoie des data pour avancer d'un step
-            I2C_WriteGPIO_UnData_PCA95( ID_I2C_M(Moteur_2) , 0x16);
-            I2C_WriteGPIO_UnData_PCA95( ID_I2C_M(Moteur_2) , 0x14);
-            I2C_WriteGPIO_UnData_PCA95( ID_I2C_M(Moteur_2) , 0x10);
-            I2C_WriteGPIO_UnData_PCA95( ID_I2C_M(Moteur_2) , 0x12);
-            //I2C_WriteGPIO_PCA95( ID_I2C_M(Moteur_3) , Step_Positif, 4);  
+            GEST_Mode();
+
             //changement d'état de la machine d'état
             APP_UpdateState(APP_STATE_WAIT);
             break;

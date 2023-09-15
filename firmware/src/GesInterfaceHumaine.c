@@ -256,7 +256,7 @@ void GEST_Mode(void)
             else
             {
                 //fonction permettant de faire tourner le système dans le mode mormal
-                //Mode_Normal();
+                Mode_Normal();
             }
             
         break;

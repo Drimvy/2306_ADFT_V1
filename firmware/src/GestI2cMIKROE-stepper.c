@@ -18,8 +18,8 @@
 #include "peripheral\osc\plib_osc.h"
 
 //declaration de la valeur des tableaux
-uint8_t Step_Positif[4] = {0x16, 0x14, 0x10, 0x12}; //moteur tourne dans le sens horaire
-uint8_t Step_Negatif[4] = {0x12, 0x10, 0x14, 0x16};//moteur tourne dans le sens anti-horaire
+uint8_t Step_Positif[4] = {0x46, 0x44, 0x40, 0x42}; //moteur tourne dans le sens horaire
+uint8_t Step_Negatif[4] = {0x42, 0x40, 0x44, 0x46};//moteur tourne dans le sens anti-horaire
 
 //---------------------------------------------------------------------------------	
 // Fonction I2C_INITMOTEUR
@@ -45,14 +45,20 @@ void I2C_InitMoteur( uint32_t ID)
 
 void I2C_WriteConfigPCA95( uint32_t ID)
 {
-    i2c_start(ID);//start
-    i2c_write(PCA9538A_wr,ID);	// adresse + écriture
-    //i2c_read(1, ID);            // ack
+    //Mise des sorties à leurs valeurs par défaut
+    i2c_start(ID);//start   
+    i2c_write(PCA9538A_wr ,ID);	// adresse + écriture 
     i2c_write(PCA9538A_pt_Output, ID);	// sélection ptr. output.
-   // i2c_read(1, ID);            // ack
-    i2c_write(PCA9538A_Config_OUTput, ID);	// data to port
-    //i2c_read(1, ID);            // ack
+    i2c_write(PCA9538A_OutputInitValue, ID);	// data to port
     i2c_stop(ID);               //Stop
+    
+    //Toutes les IO en sorties
+    i2c_start(ID);//start    
+    i2c_write(PCA9538A_wr ,ID);	// adresse + écriture
+    i2c_write(PCA9538A_pt_Config, ID);	// sélection ptr. output.
+    i2c_write(PCA9538A_ConfigInitValue, ID);	// data to port
+    i2c_stop(ID);               //Stop
+            
 } // I2C_WriteConfigPCA95
 
 //---------------------------------------------------------------------------------	
@@ -66,12 +72,19 @@ void I2C_WriteGPIO_PCA95( uint32_t ID , uint8_t *Step, uint8_t Taille)
     int i;                      //initialiser la varible
     i2c_start(ID);              //Start
     i2c_write(PCA9538A_wr, ID);	// adresse + écriture
+    i2c_write(PCA9538A_pt_Output, ID);	// sélection ptr. output.
     for ( i = 0; i < Taille; i++) //Ecrire chaque data du tableau
     {
-        //i2c_read(1, ID);        // ack
-        i2c_write(Step[i], ID); //ecrire les datas pour definir l'etat des pin 
+        if(BoutonPlus ()|| BoutonMinus ())
+        { 
+            i = Taille;
+        }
+        else
+        {
+            i2c_write(Step[i], ID); //ecrire les datas pour definir l'etat des pin
+            delay_ms(10);
+        }
     }    
-    //i2c_read(1, ID);            // ack
     i2c_stop(ID);               //Stop
 } //I2C_WriteGPIO_PCA95
 
@@ -85,11 +98,10 @@ void I2C_WriteGPIO_UnData_PCA95( uint32_t ID , uint8_t Step)
 {
     i2c_start(ID);              //Start
     i2c_write(PCA9538A_wr, ID);	// adresse + écriture
-    
-    //i2c_read(1, ID);        // ack
+    i2c_write(PCA9538A_pt_Output, ID);	// sélection ptr. output.
+
     i2c_write(Step, ID); //ecrire les datas pour definir l'etat des pin 
-       
-    //i2c_read(1, ID);            // ack
+
     i2c_stop(ID);               //Stop
 } //I2C_WriteGPIO_PCA95
  

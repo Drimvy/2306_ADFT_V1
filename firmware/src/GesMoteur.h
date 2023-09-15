@@ -23,6 +23,7 @@
 #include "driver/tmr/drv_tmr_static.h"
 #include "peripheral/oc/plib_oc.h"
 #include "Mc32Delays.h"
+#include "Mc32Delays.h"
 
 // *****************************************************************************
 // *****************************************************************************
