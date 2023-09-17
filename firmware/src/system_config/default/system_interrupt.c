@@ -73,6 +73,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 //Timer 1 avec une interuption toute des 1ms
 void __ISR(_TIMER_1_VECTOR, ipl3AUTO) IntHandlerDrvTmrInstance0(void)
 {
+    LED_TestOn();
     //variable local
     //compteur pour entrer dans l'etat service task
     static uint16_t Compteur_Service_Tasks= 0; 
@@ -92,6 +93,7 @@ void __ISR(_TIMER_1_VECTOR, ipl3AUTO) IntHandlerDrvTmrInstance0(void)
         //incrémenter le compteur
         Compteur_Service_Tasks ++;
     }
+    LED_TestOff();
     //Clear le falg d'interuption configurer via harmony
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_1);
 }

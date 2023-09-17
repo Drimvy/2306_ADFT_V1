@@ -358,6 +358,9 @@ extern "C" {
 /*** Functions for Interrupt_M2 pin ***/
 #define Interrupt_M2StateGet() PLIB_PORTS_PinGet(PORTS_ID_0, PORT_CHANNEL_D, PORTS_BIT_POS_5)
 
+/*** Functions for RaspbX_uC pin ***/
+#define RaspbX_uCStateGet() PLIB_PORTS_PinGet(PORTS_ID_0, PORT_CHANNEL_E, PORTS_BIT_POS_0)
+
 /*** Functions for Raspb3 pin ***/
 #define Raspb3StateGet() PLIB_PORTS_PinGet(PORTS_ID_0, PORT_CHANNEL_E, PORTS_BIT_POS_1)
 
@@ -369,11 +372,6 @@ extern "C" {
 
 /*** Functions for Raspb2 pin ***/
 #define Raspb2StateGet() PLIB_PORTS_PinGet(PORTS_ID_0, PORT_CHANNEL_E, PORTS_BIT_POS_4)
-
-/*** Functions for RaspbX_uC pin ***/
-#define RaspbX_uC_PORT PORT_CHANNEL_E
-#define RaspbX_uC_PIN PORTS_BIT_POS_0
-#define RaspbX_uC_PIN_MASK (0x1 << 0)
 
 
 /*** Application Instance 0 Configuration ***/

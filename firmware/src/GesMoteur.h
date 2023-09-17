@@ -30,7 +30,7 @@
 // Section: Type Definitions
 // *****************************************************************************
 // *****************************************************************************
-#define RapportPWM_pc 50 //rapport cyclique en poucent pour l'intencité de la LED
+#define RapportPWM_pc 90 //rapport cyclique en poucent pour l'intencité de la LED
 #define MAX_Step_M2 40 //nombre de STEP max avant de devoir bouger M1
 #define MAX_Step_M1 4 //nombre de STEP max avant de devoir bouger M2
 

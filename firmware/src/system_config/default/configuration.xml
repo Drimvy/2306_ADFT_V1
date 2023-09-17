@@ -195,7 +195,7 @@
       <Template dnOrder="15">
         <Name dnOrder="0">system_config.h</Name>
         <Path dnOrder="1">Header&amp;#160;Files/app/system_config/default</Path>
-        <Checksum dnOrder="2">C0AEC970BCC61D8924E3CEEEE93CC795</Checksum>
+        <Checksum dnOrder="2">95E2863C6AE2A9DC11CF4ACCE74B5628</Checksum>
       </Template>
       <Template dnOrder="16">
         <Name dnOrder="0">app.h</Name>
@@ -210,6 +210,7 @@
         <Name dnOrder="0">system_interrupt.c</Name>
         <Path dnOrder="1">Source&amp;#160;Files/app/system_config/default</Path>
         <Checksum dnOrder="2">B50A5002D77A26401557ED9FD6D73192</Checksum>
+        <ProjectFileChecksum dnOrder="3">2A7D4781D523834FCF5F1665AF66343E</ProjectFileChecksum>
       </Template>
       <Template dnOrder="19">
         <Name dnOrder="0">drv_oc_mapping.c</Name>

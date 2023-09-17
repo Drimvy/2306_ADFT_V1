@@ -143,16 +143,21 @@ void APP_Tasks ( void )
         case APP_STATE_INIT:
         {
             //Initaliser la configuration des I2C des MIKROE
-            I2C_InitMoteur(ID_I2C_M(Moteur_3));
-            I2C_InitMoteur(ID_I2C_M(Moteur_2));
-            I2C_InitMoteur(ID_I2C_M(Moteur_1));
+            //I2C_InitMoteur(ID_I2C_M(Moteur_3));
+            //I2C_InitMoteur(ID_I2C_M(Moteur_2));
+            //I2C_InitMoteur(ID_I2C_M(Moteur_1));
             //initaliser les moteur (Pin Reset à 1)
-            INIT_MOTEUR();			
+            //INIT_MOTEUR();	
+            
             //initialisation des boutons
             BoutonInit();
+            
             // Activer les timers 
             DRV_TMR0_Start();
             DRV_TMR1_Start();
+            //start OC
+            DRV_OC0_Start();
+
             //changement d'état de la machine d'état
             APP_UpdateState( APP_STATE_WAIT);
             break;
@@ -173,11 +178,9 @@ void APP_Tasks ( void )
 
         case APP_STATE_SERVICE_TASKS:
         {
-            //toggle la LED à chaque fois qui entre dans service task
-            LED_TestToggle();
             //Fonction permettant le choix du mode de fonctionnement 
             GEST_Mode();
-
+            
             //changement d'état de la machine d'état
             APP_UpdateState(APP_STATE_WAIT);
             break;

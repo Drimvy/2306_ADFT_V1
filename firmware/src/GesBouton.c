@@ -21,12 +21,12 @@
 S_SwitchDescriptor DescrBTN_Plus;
 S_SwitchDescriptor DescrBTN_Moins;
 S_SwitchDescriptor DescrBTN_OK;
-S_SwitchDescriptor DescrSW_UP;
-S_SwitchDescriptor DescrSW_Down;
+//S_SwitchDescriptor DescrSW_UP;
+//S_SwitchDescriptor DescrSW_Down;
 
 // Structure pour le traitement des boutons
 S_BTN_Descriptor Bouton;
-S_SW_Descriptor FinCourse;
+//S_SW_Descriptor FinCourse;
 
 //---------------------------------------------------------------------------------	
 // Fonction BoutonInit
@@ -40,8 +40,8 @@ void BoutonInit (void)
    DebounceInit(&DescrBTN_Plus);
    DebounceInit(&DescrBTN_Moins);
    DebounceInit(&DescrBTN_OK);
-   DebounceInit(&DescrSW_UP);
-   DebounceInit(&DescrSW_Down);
+//   DebounceInit(&DescrSW_UP);
+//   DebounceInit(&DescrSW_Down);
    
    // Init de la structure Bouton
     Bouton.Inc = 0;             // événement incrément  
@@ -49,8 +49,8 @@ void BoutonInit (void)
     Bouton.OK = 0;              // événement action OK 
     
     // Init de la structure switch fin de course
-    FinCourse.Down = 1;
-    FinCourse.Up = 0;
+//    FinCourse.Down = 1;
+//    FinCourse.Up = 0;
  } // InitBouton
 
 //---------------------------------------------------------------------------------	
@@ -64,8 +64,8 @@ void ScanBTN (bool BTN_Plus, bool BTN_Moins, bool BTN_OK, bool SW_UP, bool SW_Do
    DoDebounce (&DescrBTN_Plus, BTN_Plus);
    DoDebounce (&DescrBTN_Moins, BTN_Moins);
    DoDebounce (&DescrBTN_OK, BTN_OK);
-   DoDebounce (&DescrSW_UP, SW_UP);
-   DoDebounce (&DescrSW_Down, SW_Down);
+//   DoDebounce (&DescrSW_UP, SW_UP);
+//   DoDebounce (&DescrSW_Down, SW_Down);
    
    if(DebounceIsPressed(&DescrBTN_Plus))
    {      
@@ -104,31 +104,31 @@ void ScanBTN (bool BTN_Plus, bool BTN_Moins, bool BTN_OK, bool SW_UP, bool SW_Do
         }    
    }
    
-    if(DebounceIsPressed(&DescrSW_UP))
-   {      
-        DebounceClearPressed(&DescrSW_UP);
-        if(FinCourse.Up == false)
-        {
-            FinCourse.Up = true;
-        }
-        else
-        {
-            FinCourse.Up = false;
-        }    
-   } 
-   
-    if(DebounceIsPressed(&DescrSW_Down))
-   {      
-        DebounceClearPressed(&DescrSW_Down);
-        if(FinCourse.Down == false)
-        {
-            FinCourse.Down = true;
-        }
-        else
-        {
-            FinCourse.Down = false;
-        }    
-   } 
+//    if(DebounceIsPressed(&DescrSW_UP))
+//   {      
+//        DebounceClearPressed(&DescrSW_UP);
+//        if(FinCourse.Up == false)
+//        {
+//            FinCourse.Up = true;
+//        }
+//        else
+//        {
+//            FinCourse.Up = false;
+//        }    
+//   } 
+//   
+//    if(DebounceIsPressed(&DescrSW_Down))
+//   {      
+//        DebounceClearPressed(&DescrSW_Down);
+//        if(FinCourse.Down == false)
+//        {
+//            FinCourse.Down = true;
+//        }
+//        else
+//        {
+//            FinCourse.Down = false;
+//        }    
+//   } 
 }
 
 
@@ -148,13 +148,13 @@ bool BoutonIsOK    (void) {
 }
 
 //       BoutonIsOK         true indique action OK
-bool SwitchUp    (void) {
-   return (FinCourse.Up);
-}
+//bool SwitchUp    (void) {
+//   return (FinCourse.Up);
+//}
 //       BoutonIsOK         true indique action OK
-bool SwitchDown    (void) {
-   return (FinCourse.Down);
-}
+//bool SwitchDown    (void) {
+//   return (FinCourse.Down);
+//}
 
 
 //       BoutonClearPlus    annule indication d'incrément
@@ -173,10 +173,10 @@ void BoutonClearOK   (void) {
 }
 
 //       BoutonIsOK         true indique action OK
-void SwitchClearUp    (void) {
-  FinCourse.Up = 0;
-}
+//void SwitchClearUp    (void) {
+//  FinCourse.Up = 0;
+//}
 //       BoutonIsOK         true indique action OK
-void SwitchClearDown    (void) {
-   FinCourse.Down = 0;
-}
+//void SwitchClearDown    (void) {
+//   FinCourse.Down = 0;
+//}

@@ -1,8 +1,8 @@
 // GesMoteur.c
 //
-//	Description : Gestion des moteurs suivant le mode selectionnÃ©
+//	Description : Gestion des moteurs suivant le mode selectionné
 //	Auteur 		: C-Mieville
-//      CrÃ©ation       : 11.09.2023
+//      Création       : 11.09.2023
 //      Modifications  :  --
 //      Version        :  V1.0
 //      
@@ -18,9 +18,9 @@
 
 //---------------------------------------------------------------------------------	
 // Fonction INIT_MOTEUR
-// Description: Fonction permettant d'initialiser les pins necessaire Ã  la gestion 
+// Description: Fonction permettant d'initialiser les pins necessaire à la gestion 
 //              des moteurs
-// EntrÃ©es: -
+// Entrées: -
 // Sorties: -
 
 void INIT_MOTEUR(void)
@@ -32,23 +32,20 @@ void INIT_MOTEUR(void)
     //Allumer le moteur M1
     Reset_M1On();
     
-    //Ã©teindre le ventillateur et la LED
     OnOff_VentilETLED(0);
-
-    //Maintenir ces PIN Ã  l'Ã©tat haut 
-    //(elle permette de faire tourner les moteur)
-    INB1_M3On();
-    INB1_M2On();
-    INB1_M1On();
-    
-    INB2_M3On();
-    INB2_M2On();
-    INB2_M1On();
-    
+    //activer les Input pour faire tourner le moteur
+    //Moteur 3
     INA1_M3On();
+    INB1_M3On();
+    INB2_M3On();
+    //moteur 2
     INA1_M2On();
-    INA1_M1On();
-    
+    INB1_M2On();
+    INB2_M2On();
+    //Moteur 1 
+    INA1_M1On(); 
+    INB1_M1On();
+    INB2_M1On();
 }
 
 
@@ -57,17 +54,21 @@ void INIT_MOTEUR(void)
 // Description: Fonction permettant la gestion des trois moteur pour effectuer les 
 //              mouvement du Mode Normal
 //        
-// EntrÃ©es: -
+// Entrées: -
 // Sorties: -
 
 void Mode_Normal(void)
 {
-    //DÃ©clatation de varable local 
-    //Initaliser la machine d'Ã©tat en static en mode STATE_MOTEUR_M3
+    //Déclatation de varable local 
+    //Initaliser la machine d'état en static en mode STATE_MOTEUR_M3
     static STATES_MODE_Moteur Val_Mode_Moteur = STATE_MOTEUR_M3;
     //varible compteur de step
     uint8_t Nbr_Step_M2 = 0;
     uint8_t Nbr_Step_M1 = 0;
+    
+    static int i;
+    
+    uint8_t Step_Positif[4] = {0x46, 0x44, 0x40, 0x42}; //moteur tourne dans le sens horaire
 
     switch(Val_Mode_Moteur)
     {
@@ -75,14 +76,23 @@ void Mode_Normal(void)
             //Si le capteur de fin course du haut est actif 
             if(FinCourse_UpStateGet())
             {
-                //Changer d'Ã©tat (faire tourner le moteur M2)
+                //Changer d'état (faire tourner le moteur M2)
                 Val_Mode_Moteur = STATE_MOTEUR_M2;
             }
             //sinon faire tourner le moteur 
             else 
             {
-                //envoie des data pour avancer d'un step
-                I2C_WriteGPIO_PCA95( ID_I2C_M(Moteur_3) , Step_Positif, 4);
+                
+                if(i == 4)
+                {
+                    i = 0;
+                }
+                else
+                {
+                    I2C_WriteGPIO_UnData_PCA95(ID_I2C_M(Moteur_3), Step_Positif[i]);
+                    i++;
+                    delay_ms(10);
+                }             
             }
   
         break;
@@ -91,16 +101,16 @@ void Mode_Normal(void)
             //Si le capteur de fin course du bas est actif 
             if (FinCourse_DownStateGet())
             {
-                //Ã©teindre la LED et le ventillateur
+                //éteindre la LED et le ventillateur
                 OnOff_VentilETLED(0);
-                //Changer d'Ã©tat (faire tourner le moteur M3)
+                //Changer d'état (faire tourner le moteur M3)
                 Val_Mode_Moteur = STATE_MOTEUR_M3;
             }
             else
             { 
                 //allumer la LED et le ventillateur
                 OnOff_VentilETLED(1);
-                /*Si la PIN est Ã  l'etat haut (Pin servant Ã  simuler le signal 
+                /*Si la PIN est à l'etat haut (Pin servant à simuler le signal 
                 qui sera envoyer par le Raspberry pi)*/
                 if(Raspb1StateGet())
                 {
@@ -111,19 +121,19 @@ void Mode_Normal(void)
                 {
                     //envoie des data pour avancer d'un step
                     I2C_WriteGPIO_PCA95( ID_I2C_M(Moteur_2) , Step_Positif, 4);
-                    //Si le moteur 2 Ã  avance de moins de 4 step
+                    //Si le moteur 2 à avance de moins de 4 step
                     if (Nbr_Step_M2 < 40)
                     {
-                        //incrÃ©menter la compteur de step
+                        //incrémenter la compteur de step
                         Nbr_Step_M2 ++;
-                        //rester dans la machine d'etat Ã  l'etat STATE_MOTEUR_M2
+                        //rester dans la machine d'etat à l'etat STATE_MOTEUR_M2
                         Val_Mode_Moteur = STATE_MOTEUR_M2;
                     }
                     else
                     {
-                        //mettre la valeur du compteur Ã  0
+                        //mettre la valeur du compteur à 0
                         Nbr_Step_M2 = 0;
-                        //Changer d'Ã©tat (faire tourner le moteur M1)
+                        //Changer d'état (faire tourner le moteur M1)
                         Val_Mode_Moteur = STATE_MOTEUR_M1;
                     }
                 }
@@ -133,34 +143,36 @@ void Mode_Normal(void)
         case STATE_MOTEUR_M1:
             if (FinCourse_DownStateGet())
             {
-                //Ã©teindre la LED et le ventillateur
+                //éteindre la LED et le ventillateur
                 OnOff_VentilETLED(0);
-                //Changer d'Ã©tat (faire tourner le moteur M3)
+                //Changer d'état (faire tourner le moteur M3)
                 Val_Mode_Moteur = STATE_MOTEUR_M3;
             }
             else
             { 
                 //envoie des data pour avancer d'un step
                 I2C_WriteGPIO_PCA95( ID_I2C_M(Moteur_1) , Step_Positif, 4);
-                //Si le moteur 1 Ã  avance de moins de 4 step
+                //Si le moteur 1 à avance de moins de 4 step
                 if (Nbr_Step_M1 < 4)
                 {
-                    //incrÃ©menter la compteur de step
+                    //incrémenter la compteur de step
                     Nbr_Step_M1 ++;
-                    //rester dans la machine d'etat Ã  l'etat STATE_MOTEUR_M1
+                    //rester dans la machine d'etat à l'etat STATE_MOTEUR_M1
                     Val_Mode_Moteur = STATE_MOTEUR_M1;
                 }
                 else
                 {
-                    //mettre la valeur du compteur Ã  0
+                    //mettre la valeur du compteur à 0
                     Nbr_Step_M1 = 0;
-                    //Changer d'Ã©tat (faire tourner le moteur M2)
+                    //Changer d'état (faire tourner le moteur M2)
                     Val_Mode_Moteur = STATE_MOTEUR_M2;
                 }
             }
             
         break;   
     }
+    //SwitchClearDown();
+    //SwitchClearUp();
 }
 
 //---------------------------------------------------------------------------------	
@@ -168,7 +180,7 @@ void Mode_Normal(void)
 // Description: Fonction permettant la gestion des trois moteur pour effectuer une 
 //              avance rapide
 //        
-// EntrÃ©es: -
+// Entrées: -
 // Sorties: -
 
 void Mode_Avance_Rapide(void)
@@ -181,7 +193,7 @@ void Mode_Avance_Rapide(void)
 // Description: Fonction permettant la gestion des trois moteur pour effectuer un 
 //              avance lente
 //        
-// EntrÃ©es: -
+// Entrées: -
 // Sorties: -
 
 void Mode_Avance_Lente(void)
@@ -194,7 +206,7 @@ void Mode_Avance_Lente(void)
 // Description: Fonction permettant la gestion des trois moteur pour effectuer un 
 //              retour lent
 //        
-// EntrÃ©es: -
+// Entrées: -
 // Sorties: -
 
 void Mode_Retour_Lent(void)
@@ -207,7 +219,7 @@ void Mode_Retour_Lent(void)
 // Description: Fonction permettant la gestion des trois moteur pour effectuer un 
 //              rembobinage
 //        
-// EntrÃ©es: -
+// Entrées: -
 // Sorties: -
 
 void Mode_Rembobinage(void)
@@ -216,25 +228,23 @@ void Mode_Rembobinage(void)
 }
 //---------------------------------------------------------------------------------	
 // Fonction OnOff_VentilETLED
-// Description: Fonction permettant d'Ã©teindre ou allumer la ventillation et la LED 
-//              de puissance. Dans le cas de la LED, son intensitÃ© lumineuse et gÃ©rÃ©
+// Description: Fonction permettant d'éteindre ou allumer la ventillation et la LED 
+//              de puissance. Dans le cas de la LED, son intensité lumineuse et géré
 //              par un signal PWM     
 //                          
-// EntrÃ©es: entrer un 1 pour enclancher la led et la ventillation, et un 0 pour tout
-//          Ã©teindre (LED et Ventillaton)
+// Entrées: entrer un 1 pour enclancher la led et la ventillation, et un 0 pour tout
+//          éteindre (LED et Ventillaton)
 // Sorties: -
 void OnOff_VentilETLED(bool Etat)
 {
-    uint32_t PeriodeTimer3 = 0;
+    //Obtention de la periode du timer 
+    uint32_t PeriodeTimer3 = DRV_TMR1_PeriodValueGet() ;
+    uint8_t PWM_OFF = 0;
     //Alumer la LED et le ventillateur
     if (Etat == 1)
     {
-        //allumer le ventillateur pour refroidire la LED (signal inversÃ©)
-        CTRL_VentilOff();
-        //start OC
-        DRV_OC0_Start();
-        //Obtention de la periode du timer 
-        PeriodeTimer3 = DRV_TMR1_PeriodValueGet();  
+        //allumer le ventillateur pour refroidire la LED (signal inversé)
+        CTRL_VentilOff(); 
         //Calcul du rapport de la pulse, (inversion du PWM ), 
         //entrer la valeur du PWM voulu en poucent sur le define: RapportPWM_pc
         PeriodeTimer3 = PeriodeTimer3 * (100-RapportPWM_pc)/100;
@@ -243,9 +253,13 @@ void OnOff_VentilETLED(bool Etat)
     }
     else
     {
+        PeriodeTimer3 = DRV_TMR1_PeriodValueGet();
         //Stop OC (Stopper le PWM)
-        DRV_OC0_Stop();
-        //allumer la pin controlant le ventillateur pour arreter refroidire la LED (signal inversÃ©)
+        //entrer la valeur du PWM voulu en poucent sur le define: RapportPWM_pc
+        PeriodeTimer3 = PeriodeTimer3 * (100-PWM_OFF)/100;
+        //MAJ de la pulse du PWM 
+        DRV_OC0_PulseWidthSet(PeriodeTimer3);
+        //allumer la pin controlant le ventillateur pour arreter refroidire la LED (signal inversé)
         CTRL_VentilOn();
     }
 }
