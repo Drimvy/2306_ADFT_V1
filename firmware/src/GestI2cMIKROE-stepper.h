@@ -19,7 +19,7 @@
 #include <stdint.h>
 #include "GesMoteur.h"
 #include "Mc32_I2cUtilCCS.h"
-#include "Mc32Delays.h"
+
 
 // *****************************************************************************
 // *****************************************************************************
@@ -35,8 +35,9 @@
 #define PCA9538A_pt_Output  0x01        // adr. registre output port
 #define PCA9538A_pt_Config  0x03        // adr. registre configuration port
 
-#define PCA9538A_OutputInitValue 0x46
-#define PCA9538A_ConfigInitValue 0x00
+#define PCA9538A_OutputInitValue 0x46   //Valeur de sortie des pin du I/O expender M1 et M3
+#define PCA9538A_ConfigInitValue 0x00   //Valeur pour configurer toute les pin du I/O expender en sortie
+#define PCA9538A_OutputInitValue_M2 0x02    //Valeur initialiser pour le mode fonctionnement M2 (Half step)
 
 #define I2C_M1  I2C_ID_4 //ID 1
 #define I2C_M2  I2C_ID_1 //ID 2
@@ -58,12 +59,11 @@ void I2C_WriteConfigPCA95(uint32_t ID);
 void I2C_WriteGPIO_PCA95( uint32_t ID , uint8_t *Step, uint8_t Taille);
 //---------------------------------------------------------------------------------	
 // Fonction I2C_WriteGPIO_PCA95:  Fonction permettant de definir l'etat des pins (envoie que d'un octet)
-void I2C_WriteGPIO_UnData_PCA95( uint32_t ID , uint8_t Step);
+void I2C_Write_Data_PCA95( uint32_t ID , uint8_t Step);
+
 //---------------------------------------------------------------------------------	
 // Fonction ID_I2C_M:  Fonction retournant la valeur de I2C ID
 uint32_t ID_I2C_M(uint8_t Num_Mot);
-//---------------------------------------------------------------------------------	
-// Fonction I2C_ReadGPIO_PCA95:  Fonction 
-//int16_t I2C_ReadGPIO_PCA95(uint32_t ID);
 
 #endif
+// Fonction ID_I2C_M:  Fonction retournant la valeur de I2C ID

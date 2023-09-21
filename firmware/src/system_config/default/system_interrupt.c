@@ -73,15 +73,14 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 //Timer 1 avec une interuption toute des 1ms
 void __ISR(_TIMER_1_VECTOR, ipl3AUTO) IntHandlerDrvTmrInstance0(void)
 {
+    //allumer la LED de test
     LED_TestOn();
-    //variable local
-    //compteur pour entrer dans l'etat service task
+    //initalisation du compteur pour entrer dans l'etat service task
     static uint16_t Compteur_Service_Tasks= 0; 
-    
-    //lire la valeur des boutons
+    //lire la valeur des boutons à chaque interuption
     ScanBTN (BTN_PlusStateGet(), BTN_MoinsStateGet(), BTN_OKStateGet(),FinCourse_UpStateGet(),FinCourse_DownStateGet());
-    //entrer dans le l'etat service task toute les 10ms (Machine d'état app.c)
-    if (Compteur_Service_Tasks >= 10)
+    //entrer dans le l'etat service task toute les 5ms (Machine d'état app.c)
+    if (Compteur_Service_Tasks >= 5)
     {   
         //Mettre le compteur à 0
         Compteur_Service_Tasks = 0;
@@ -93,6 +92,7 @@ void __ISR(_TIMER_1_VECTOR, ipl3AUTO) IntHandlerDrvTmrInstance0(void)
         //incrémenter le compteur
         Compteur_Service_Tasks ++;
     }
+    //eteindre la LED de test
     LED_TestOff();
     //Clear le falg d'interuption configurer via harmony
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_1);

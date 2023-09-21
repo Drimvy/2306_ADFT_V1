@@ -14,19 +14,17 @@
 // *****************************************************************************
 // *****************************************************************************
 #include "GesBouton.h"
-#include "Mc32Debounce.h"
 
 //Declaration des variables de structure
 // Descripteur des sinaux
 S_SwitchDescriptor DescrBTN_Plus;
 S_SwitchDescriptor DescrBTN_Moins;
 S_SwitchDescriptor DescrBTN_OK;
-//S_SwitchDescriptor DescrSW_UP;
-//S_SwitchDescriptor DescrSW_Down;
+
 
 // Structure pour le traitement des boutons
 S_BTN_Descriptor Bouton;
-//S_SW_Descriptor FinCourse;
+
 
 //---------------------------------------------------------------------------------	
 // Fonction BoutonInit
@@ -40,22 +38,17 @@ void BoutonInit (void)
    DebounceInit(&DescrBTN_Plus);
    DebounceInit(&DescrBTN_Moins);
    DebounceInit(&DescrBTN_OK);
-//   DebounceInit(&DescrSW_UP);
-//   DebounceInit(&DescrSW_Down);
-   
+
    // Init de la structure Bouton
     Bouton.Inc = 0;             // événement incrément  
     Bouton.Dec = 0;             // événement décrément 
     Bouton.OK = 0;              // événement action OK 
     
-    // Init de la structure switch fin de course
-//    FinCourse.Down = 1;
-//    FinCourse.Up = 0;
  } // InitBouton
 
 //---------------------------------------------------------------------------------	
 // Fonction ScanBTN
-// Description: Fonction permettant d'intiquer la pression d'un bouton
+// Description: Fonction permettant d'indiquer la pression d'un bouton
 // Entrées: valeur sur la sortie des boutons  
 // Sorties: -
 void ScanBTN (bool BTN_Plus, bool BTN_Moins, bool BTN_OK, bool SW_UP, bool SW_Down)
@@ -64,119 +57,117 @@ void ScanBTN (bool BTN_Plus, bool BTN_Moins, bool BTN_OK, bool SW_UP, bool SW_Do
    DoDebounce (&DescrBTN_Plus, BTN_Plus);
    DoDebounce (&DescrBTN_Moins, BTN_Moins);
    DoDebounce (&DescrBTN_OK, BTN_OK);
-//   DoDebounce (&DescrSW_UP, SW_UP);
-//   DoDebounce (&DescrSW_Down, SW_Down);
-   
+
+   //Si le boutons plus est presser
    if(DebounceIsPressed(&DescrBTN_Plus))
    {      
+       //clear l'indication bouton appuyer
         DebounceClearPressed(&DescrBTN_Plus);
+        //si le bouton == 0
         if(Bouton.Inc == false)
         {
+            //mettre à 1 la valeur du bouton
             Bouton.Inc = true;
         }
         else
         {
+            //maintenir à 0 la valeur du bouton
             Bouton.Inc = false;
         }    
    }
+   //Si le boutons moins est pressé
    if(DebounceIsPressed(&DescrBTN_Moins))
    {      
+       //clear l'indication bouton appuyer
         DebounceClearPressed(&DescrBTN_Moins);
+        //si le bouton == 0
         if(Bouton.Dec == false)
         {
+            //mettre à 1 la valeur du bouton
             Bouton.Dec = true;
         }
         else
         {
+            //maintenir à 0 la valeur du bouton
             Bouton.Dec = false;
         }    
    }
+   //Si le boutons ok est pressé
    if(DebounceIsPressed(&DescrBTN_OK))
-   {      
+   { 
+       //clear l'indication bouton appuyer
         DebounceClearPressed(&DescrBTN_OK);
+        //si le bouton == 0
         if(Bouton.OK == false)
         {
+            //mettre à 1 la valeur du bouton
             Bouton.OK = true;
         }
         else
         {
+            //maintenir à 0 la valeur du bouton
             Bouton.OK = false;
         }    
    }
    
-//    if(DebounceIsPressed(&DescrSW_UP))
-//   {      
-//        DebounceClearPressed(&DescrSW_UP);
-//        if(FinCourse.Up == false)
-//        {
-//            FinCourse.Up = true;
-//        }
-//        else
-//        {
-//            FinCourse.Up = false;
-//        }    
-//   } 
-//   
-//    if(DebounceIsPressed(&DescrSW_Down))
-//   {      
-//        DebounceClearPressed(&DescrSW_Down);
-//        if(FinCourse.Down == false)
-//        {
-//            FinCourse.Down = true;
-//        }
-//        else
-//        {
-//            FinCourse.Down = false;
-//        }    
-//   } 
 }
 
-
-//       BoutonPlus       true indique un nouveau incrément
+//---------------------------------------------------------------------------------	
+// Fonction BoutonPlus
+// Description: Fonction permettant d'indiquer la valeur du bouton
+// Entrées: - 
+// Sorties: Valeur du bouton
 bool BoutonPlus    (void) {
    return (Bouton.Inc);
 }
 
-//       BoutonMinus      true indique un nouveau décrément
+//---------------------------------------------------------------------------------	
+// Fonction BoutonMinus
+// Description: Fonction permettant d'indiquer la valeur du bouton
+// Entrées: - 
+// Sorties: Valeur du bouton
 bool BoutonMinus    (void) {
    return (Bouton.Dec);
 }
 
-//       BoutonIsOK         true indique action OK
+//---------------------------------------------------------------------------------	
+// Fonction BoutonIsOK
+// Description: Fonction permettant d'indiquer la valeur du bouton
+// Entrées: - 
+// Sorties: Valeur du bouton
 bool BoutonIsOK    (void) {
    return (Bouton.OK);
 }
 
-//       BoutonIsOK         true indique action OK
-//bool SwitchUp    (void) {
-//   return (FinCourse.Up);
-//}
-//       BoutonIsOK         true indique action OK
-//bool SwitchDown    (void) {
-//   return (FinCourse.Down);
-//}
-
 
 //       BoutonClearPlus    annule indication d'incrément
+//---------------------------------------------------------------------------------	
+// Fonction BoutonClearPlus
+// Description: Fonction permettant pour BoutonClearPlus d'annuler indication 
+//              indication de d'incrémenter
+// Entrées: - 
+// Sorties: -
 void BoutonClearPlus   (void) {
    Bouton.Inc = 0;
 }
 
-//       BoutonClearMinus   annule indication de décrément
+
+//---------------------------------------------------------------------------------	
+// Fonction BoutonClearMinus
+// Description: Fonction permettant pour BoutonClearMinus d'annuler indication 
+//              indication de décrément
+// Entrées: - 
+// Sorties: -
 void BoutonClearMinus   (void) {
    Bouton.Dec = 0;
 }
 
-//       BoutonClearOK      annule indication action OK
+//---------------------------------------------------------------------------------	
+// Fonction BoutonClearOK
+// Description: Fonction permettant pour BoutonClearOK d'annuler indication action OK
+// Entrées: - 
+// Sorties: -
 void BoutonClearOK   (void) {
    Bouton.OK = 0;
 }
 
-//       BoutonIsOK         true indique action OK
-//void SwitchClearUp    (void) {
-//  FinCourse.Up = 0;
-//}
-//       BoutonIsOK         true indique action OK
-//void SwitchClearDown    (void) {
-//   FinCourse.Down = 0;
-//}

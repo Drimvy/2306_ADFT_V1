@@ -15,6 +15,8 @@
 // *****************************************************************************
 #include "GesMoteur.h"
 
+//initaliser la variable de la structure
+S_VAL_STEP Etape_Step;
 
 //---------------------------------------------------------------------------------	
 // Fonction INIT_MOTEUR
@@ -22,32 +24,39 @@
 //              des moteurs
 // Entrées: -
 // Sorties: -
-
 void INIT_MOTEUR(void)
 {
     //Allumer le moteur M3
     Reset_M3On();
     //Allumer le moteur M2
-    Reset_M2On();
+    Reset_M2Off();//fonctionne normalement
     //Allumer le moteur M1
     Reset_M1On();
     
+    //éteindre le ventillateur et la LED
     OnOff_VentilETLED(0);
-    //activer les Input pour faire tourner le moteur
-    //Moteur 3
+    
+    //initaialiser les pin pour le maintien du moteur 
+    //Moteur 3 mettre toute ces pins à 1
     INA1_M3On();
     INB1_M3On();
     INB2_M3On();
-    //moteur 2
-    INA1_M2On();
-    INB1_M2On();
-    INB2_M2On();
-    //Moteur 1 
+    
+    //moteur 2 initaialiser les pin 
+    CLK_M2Off();
+    Enable_M2On();//normal operation mode
+    Rot_Dir_M2Off();//sense anti horaire
+    
+    //Moteur 1 mettre toute ces pins à 1
     INA1_M1On(); 
     INB1_M1On();
     INB2_M1On();
+    
+    //valeur pour init de la structure
+    Etape_Step.M1 = 0;
+    Etape_Step.M2 = 0;
+    Etape_Step.M3 = 6;
 }
-
 
 //---------------------------------------------------------------------------------	
 // Fonction Mode_Normal
@@ -56,20 +65,18 @@ void INIT_MOTEUR(void)
 //        
 // Entrées: -
 // Sorties: -
-
 void Mode_Normal(void)
 {
     //Déclatation de varable local 
     //Initaliser la machine d'état en static en mode STATE_MOTEUR_M3
     static STATES_MODE_Moteur Val_Mode_Moteur = STATE_MOTEUR_M3;
     //varible compteur de step
-    uint8_t Nbr_Step_M2 = 0;
-    uint8_t Nbr_Step_M1 = 0;
-    
-    static int i;
-    
-    uint8_t Step_Positif[4] = {0x46, 0x44, 0x40, 0x42}; //moteur tourne dans le sens horaire
+    static uint16_t Nbr_Step_M2 = 500;
+    static uint8_t Nbr_Step_M1 = 0;
 
+    //uint8_t Step_Positif[4] = {0x46, 0x44, 0x40, 0x42}; //moteur tourne dans le sens horaire
+    //uint8_t Half_Step_Positif[8] = {0x46,0x06, 0x44, 0x44, 0x40, 0x00, 0x42, 0x42}; //moteur tourne dans le sens horaire
+    uint8_t Quarter_Step_Positif[16] = {0x06,0x46,0x06,0x44,0x04,0x44,0x44,0x40,0x00,0x40,0x00,0x42,0x02,0x42,0x42,0x46}; //moteur tourne dans le sens horaire
     switch(Val_Mode_Moteur)
     {
         case STATE_MOTEUR_M3:
@@ -78,23 +85,25 @@ void Mode_Normal(void)
             {
                 //Changer d'état (faire tourner le moteur M2)
                 Val_Mode_Moteur = STATE_MOTEUR_M2;
+
             }
             //sinon faire tourner le moteur 
             else 
             {
-                
-                if(i == 4)
+                //modifier l'etat des pin INA1, INB1 et INB2
+                Quarter_Step_M3(Etape_Step.M3);
+                //moifier la valeur des port de I/O expender (controler via I2C))
+                I2C_Write_Data_PCA95(ID_I2C_M(Moteur_3), Quarter_Step_Positif[Etape_Step.M3]);
+                //incréementer la valeur du compteur
+                Etape_Step.M3++;
+                //si la valeur de  Val_HalfStep est supérieur au égale à 16
+                //le moteur à fait un step complet
+                if (Etape_Step.M3 >= NBR_ETAPE_STEP_M3)
                 {
-                    i = 0;
-                }
-                else
-                {
-                    I2C_WriteGPIO_UnData_PCA95(ID_I2C_M(Moteur_3), Step_Positif[i]);
-                    i++;
-                    delay_ms(10);
-                }             
+                    // remettre la valeur du compteurs à 0
+                    Etape_Step.M3 = 0;
+                }          
             }
-  
         break;
         
         case STATE_MOTEUR_M2:
@@ -112,30 +121,43 @@ void Mode_Normal(void)
                 OnOff_VentilETLED(1);
                 /*Si la PIN est à l'etat haut (Pin servant à simuler le signal 
                 qui sera envoyer par le Raspberry pi)*/
-                if(Raspb1StateGet())
+                if(Raspb2StateGet())
                 {
-                    //prendre une photo
-                    delay_us(100);//simulation de la prise de photo
-                }
-                else
-                {
-                    //envoie des data pour avancer d'un step
-                    I2C_WriteGPIO_PCA95( ID_I2C_M(Moteur_2) , Step_Positif, 4);
-                    //Si le moteur 2 à avance de moins de 4 step
-                    if (Nbr_Step_M2 < 40)
+                    //mettre le signal du clock à l'état haut
+                    CLK_M2On();
+                   //Si le moteur 2 à avance de moins de 4 step
+                    if (Nbr_Step_M2 > 0)
                     {
-                        //incrémenter la compteur de step
-                        Nbr_Step_M2 ++;
-                        //rester dans la machine d'etat à l'etat STATE_MOTEUR_M2
-                        Val_Mode_Moteur = STATE_MOTEUR_M2;
+                        //décréementer la valeur du compteur
+                        Etape_Step.M2++;
+                        //si la valeur de  Val_HalfStep est supérieur au égale à 8
+                        //le moteur à fait un step complet
+                        if (Etape_Step.M2 >= NBR_ETAPE_STEP_M2)
+                        {
+                            // remettre la valeur du compteurs à 0
+                            Etape_Step.M2 = 0;
+                            //incrémenter la compteur de step
+                            Nbr_Step_M2 --;
+                        } 
                     }
                     else
                     {
                         //mettre la valeur du compteur à 0
-                        Nbr_Step_M2 = 0;
+                        Nbr_Step_M2 = MAX_Step_M2;
+                        //éteindre la LED et le ventillateur
+                        OnOff_VentilETLED(0);
                         //Changer d'état (faire tourner le moteur M1)
                         Val_Mode_Moteur = STATE_MOTEUR_M1;
-                    }
+                    } 
+                    //attendre 500 us (pour que le système est le temps de lire le flanc positif du clock)
+                    delay_us(500);
+                    //mettre le signal clock à 0
+                    CLK_M2Off();
+                }
+                else
+                {
+                    //prendre une photo
+                    delay_ms(1000);//simulation de la prise de photo
                 }
             }
         break;
@@ -143,22 +165,29 @@ void Mode_Normal(void)
         case STATE_MOTEUR_M1:
             if (FinCourse_DownStateGet())
             {
-                //éteindre la LED et le ventillateur
-                OnOff_VentilETLED(0);
                 //Changer d'état (faire tourner le moteur M3)
                 Val_Mode_Moteur = STATE_MOTEUR_M3;
             }
             else
             { 
-                //envoie des data pour avancer d'un step
-                I2C_WriteGPIO_PCA95( ID_I2C_M(Moteur_1) , Step_Positif, 4);
                 //Si le moteur 1 à avance de moins de 4 step
-                if (Nbr_Step_M1 < 4)
+                if (Nbr_Step_M1 < MAX_Step_M1)
                 {
-                    //incrémenter la compteur de step
-                    Nbr_Step_M1 ++;
-                    //rester dans la machine d'etat à l'etat STATE_MOTEUR_M1
-                    Val_Mode_Moteur = STATE_MOTEUR_M1;
+                    //modifier l'etat des pin INA1, INB1 et INB2
+                    Quarter_Step_M1(Etape_Step.M1);
+                    //moifier la valeur des port de I/O expender (controler via I2C))
+                    I2C_Write_Data_PCA95(ID_I2C_M(Moteur_1), Quarter_Step_Positif[Etape_Step.M1]);
+                    //incréementer la valeur du compteur
+                    Etape_Step.M1++;
+                    //si la valeur de  Val_HalfStep est supérieur au égale à 16
+                    //le moteur à fait un step complet
+                    if (Etape_Step.M1 >= NBR_ETAPE_STEP_M1)
+                    {
+                        // remettre la valeur du compteurs à 0
+                        Etape_Step.M1 = 0;
+                        //incrémenter la compteur de step
+                        Nbr_Step_M1 ++;
+                    }          
                 }
                 else
                 {
@@ -171,8 +200,6 @@ void Mode_Normal(void)
             
         break;   
     }
-    //SwitchClearDown();
-    //SwitchClearUp();
 }
 
 //---------------------------------------------------------------------------------	
@@ -237,14 +264,15 @@ void Mode_Rembobinage(void)
 // Sorties: -
 void OnOff_VentilETLED(bool Etat)
 {
+    //initailiser la varable
+    uint32_t PeriodeTimer3 = 0;
     //Obtention de la periode du timer 
-    uint32_t PeriodeTimer3 = DRV_TMR1_PeriodValueGet() ;
-    uint8_t PWM_OFF = 0;
+    PeriodeTimer3 = DRV_TMR1_PeriodValueGet(); 
     //Alumer la LED et le ventillateur
     if (Etat == 1)
     {
         //allumer le ventillateur pour refroidire la LED (signal inversé)
-        CTRL_VentilOff(); 
+        CTRL_VentilOff();
         //Calcul du rapport de la pulse, (inversion du PWM ), 
         //entrer la valeur du PWM voulu en poucent sur le define: RapportPWM_pc
         PeriodeTimer3 = PeriodeTimer3 * (100-RapportPWM_pc)/100;
@@ -253,13 +281,370 @@ void OnOff_VentilETLED(bool Etat)
     }
     else
     {
-        PeriodeTimer3 = DRV_TMR1_PeriodValueGet();
-        //Stop OC (Stopper le PWM)
-        //entrer la valeur du PWM voulu en poucent sur le define: RapportPWM_pc
-        PeriodeTimer3 = PeriodeTimer3 * (100-PWM_OFF)/100;
-        //MAJ de la pulse du PWM 
-        DRV_OC0_PulseWidthSet(PeriodeTimer3);
         //allumer la pin controlant le ventillateur pour arreter refroidire la LED (signal inversé)
-        CTRL_VentilOn();
+        CTRL_VentilOn(); 
+        //Calcul du rapport de la pulse, (inversion du PWM ), 
+        //entrer la valeur du PWM voulu en poucent sur le define: RapportPWM_pc
+        PeriodeTimer3 = PeriodeTimer3 * (100-0)/100;
+        //MAJ de la pulse du PWM 
+        DRV_OC0_PulseWidthSet( PeriodeTimer3);
+    }
+}
+//---------------------------------------------------------------------------------	
+// Fonction Half_Step_M3
+// Description: Fonction permettant de mettreà jour la valeur des pins INA1, INB1 
+//              et INB2. Cela permettra de faire tourner le moteur
+//
+// Entrées: numéro d'étape de la table de vériter pour tourner le moteur en mode halfstep
+// Sorties: -
+void Half_Step_M3(uint8_t Numero_Step_M3)
+{
+    switch (Numero_Step_M3)
+    {
+        case 0:
+            INA1_M3On();
+            //INA2_M3On();
+            INB1_M3On();
+            INB2_M3On();
+        break;
+        
+        case 1:
+            INA1_M3Off();
+            //INA2_M3Off();
+        break;
+        
+        case 2:
+            INA1_M3On();
+        break;
+        
+        case 3:
+            INB1_M3Off();
+            INB2_M3Off();
+            
+        break;
+        
+        case 4:
+            INB1_M3On();
+            INB2_M3On();
+        break;
+        
+        case 5:
+            INA1_M3Off();
+            //INA2_M3Off();;
+        break;
+        
+        case 6:
+            INA1_M3On();
+            //INA2_M3On();;
+        break;
+        
+        case 7:
+            INB1_M3Off();
+            INB2_M3Off();
+        break;
+    }
+}
+//---------------------------------------------------------------------------------	
+// Fonction Half_Step_M3
+// Description: Fonction permettant de mettre à jour la valeur des pins INA1, INB1 
+//              et INB2. Cela permettra de faire tourner le moteur
+//
+// Entrées: numéro d'étape de la table de vériter pour tourner le moteur en mode quarter step
+// Sorties: -
+void Quarter_Step_M3(uint8_t Numero_Step_M3)
+{
+    switch (Numero_Step_M3)
+    {
+        case 0:
+            INA1_M3On();
+            //INA2_M3Off();
+            INB1_M3On();
+            INB2_M3Off();
+        break;
+        
+        case 1:
+            INA1_M3Off();
+            //INA2_M3On();
+            INB1_M3On();
+            INB2_M3On();
+        break;
+        
+        case 2:
+            INA1_M3Off();
+            //INA2_M3Off();
+            INB1_M3On();
+            INB2_M3On();
+        break;
+        
+        case 3:
+            INA1_M3Off();
+            //INA2_M3On();
+            INB1_M3On();
+            INB2_M3On();
+        break;
+        
+        case 4:
+            INA1_M3On();
+            //INA2_M3Off();
+            INB1_M3On();
+            INB2_M3Off();
+        break;
+        
+        case 5:
+            INA1_M3On();
+            //INA2_M3On();
+            INB1_M3Off();
+            INB2_M3On();
+        break;
+        
+        case 6:
+            INA1_M3On();
+            //INA2_M3On();
+            INB1_M3Off();
+            INB2_M3Off();
+        break;
+        
+        case 7:
+            INA1_M3On();
+            //INA2_M3On();
+            INB1_M3Off();
+            INB2_M3On();
+        break;
+        
+        case 8:
+            INA1_M3On();
+            //INA2_M3Off();
+            INB1_M3On();
+            INB2_M3Off();
+        break;
+        
+        case 9:
+            INA1_M3Off();
+            //INA2_M3On();
+            INB1_M3On();
+            INB2_M3On();
+        break;
+        
+        case 10:
+            INA1_M3Off();
+            //INA2_M3Off();
+            INB1_M3On();
+            INB2_M3On();
+        break;
+        
+        case 11:
+            INA1_M3Off();
+            //INA2_M3On();
+            INB1_M3On();
+            INB2_M3On();
+        break;
+        
+         case 12:
+            INA1_M3On();
+            //INA2_M3Off();
+            INB1_M3On();
+            INB2_M3Off();
+        break;
+        
+        case 13:
+            INA1_M3On();
+            //INA2_M3On();
+            INB1_M3Off();
+            INB2_M3On();
+        break;
+        
+        case 14:
+            INA1_M3On();
+            //INA2_M3On();
+            INB1_M3Off();
+            INB2_M3Off();
+        break;
+        
+        case 15:
+            INA1_M3On();
+            //INA2_M3On();
+            INB1_M3Off();
+            INB2_M3On();
+        break;
+    }
+}
+//---------------------------------------------------------------------------------	
+// Fonction Half_Step_M1
+// Description: Fonction permettant de mettreà jour la valeur des pins INA1, INB1 
+//              et INB2. Cela permettra de faire tourner le moteur
+//
+// Entrées: numéro d'étape de la table de vériter pour tourner le moteur en mode halfstep
+// Sorties: -
+void Half_Step_M1(uint8_t Numero_Step_M1)
+{
+    switch (Numero_Step_M1)
+    {
+        case 0:
+            INA1_M1On();
+            //INA2_M1On();
+            INB1_M1On();
+            INB2_M1On();
+        break;
+        
+        case 1:
+            INA1_M1Off();
+            //INA2_M3Off();
+        break;
+        
+        case 2:
+            INA1_M1On();
+
+        break;
+        
+        case 3:
+
+            INB1_M1Off();
+            INB2_M1Off();
+            
+        break;
+        
+        case 4:
+            INB1_M1On();
+            INB2_M1On();
+        break;
+        
+        case 5:
+            INA1_M1Off();
+            //INA2_M3Off();;
+        break;
+        
+        case 6:
+            INA1_M1On();
+            //INA2_M3On();;
+        break;
+        
+        case 7:
+            INB1_M1Off();
+            INB2_M1Off();
+        break;
+    }
+}
+//---------------------------------------------------------------------------------	
+// Fonction Quarter_Step_M1
+// Description: Fonction permettant de mettre à jour la valeur des pins INA1, INB1 
+//              et INB2. Cela permettra de faire tourner le moteur
+//
+// Entrées: numéro d'étape de la table de vériter pour tourner le moteur en mode quarter step
+// Sorties: -
+void Quarter_Step_M1(uint8_t Numero_Step_M1)
+{
+    switch (Numero_Step_M1)
+    {
+        case 0:
+            INA1_M1On();
+            //INA2_M3Off();
+            INB1_M1On();
+            INB2_M1Off();
+        break;
+        
+        case 1:
+            INA1_M1Off();
+            //INA2_M3On();
+            INB1_M1On();
+            INB2_M1On();
+        break;
+        
+        case 2:
+            INA1_M1Off();
+            //INA2_M3Off();
+            INB1_M1On();
+            INB2_M1On();
+        break;
+        
+        case 3:
+            INA1_M1Off();
+            //INA2_M3On();
+            INB1_M1On();
+            INB2_M1On();
+        break;
+        
+        case 4:
+            INA1_M1On();
+            //INA2_M3Off();
+            INB1_M1On();
+            INB2_M1Off();
+        break;
+        
+        case 5:
+            INA1_M1On();
+            //INA2_M3On();
+            INB1_M1Off();
+            INB2_M1On();
+        break;
+        
+        case 6:
+            INA1_M1On();
+            //INA2_M3On();
+            INB1_M1Off();
+            INB2_M1Off();
+        break;
+        
+        case 7:
+            INA1_M1On();
+            //INA2_M3On();
+            INB1_M1Off();
+            INB2_M1On();
+        break;
+        
+        case 8:
+            INA1_M1On();
+            //INA2_M3Off();
+            INB1_M1On();
+            INB2_M1Off();
+        break;
+        
+        case 9:
+            INA1_M1Off();
+            //INA2_M3On();
+            INB1_M1On();
+            INB2_M1On();
+        break;
+        
+        case 10:
+            INA1_M1Off();
+            //INA2_M3Off();
+            INB1_M1On();
+            INB2_M1On();
+        break;
+        
+        case 11:
+            INA1_M1Off();
+            //INA2_M3On();
+            INB1_M1On();
+            INB2_M1On();
+        break;
+        
+         case 12:
+            INA1_M1On();
+            //INA2_M3Off();
+            INB1_M1On();
+            INB2_M1Off();
+        break;
+        
+        case 13:
+            INA1_M1On();
+            //INA2_M3On();
+            INB1_M1Off();
+            INB2_M1On();
+        break;
+        
+        case 14:
+            INA1_M1On();
+            //INA2_M3On();
+            INB1_M1Off();
+            INB2_M1Off();
+        break;
+        
+        case 15:
+            INA1_M1On();
+            //INA2_M3On();
+            INB1_M1Off();
+            INB2_M1On();
+        break;
     }
 }

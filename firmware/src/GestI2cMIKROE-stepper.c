@@ -36,6 +36,7 @@ void I2C_InitMoteur( uint32_t ID)
    I2C_WriteConfigPCA95(ID);
 }
 
+
 //---------------------------------------------------------------------------------	
 // Fonction I2C_WriteConfigPCA95
 // Description: Fonction permettant de pointer sur le registre output port
@@ -49,7 +50,15 @@ void I2C_WriteConfigPCA95( uint32_t ID)
     i2c_start(ID);//start   
     i2c_write(PCA9538A_wr ,ID);	// adresse + écriture 
     i2c_write(PCA9538A_pt_Output, ID);	// sélection ptr. output.
-    i2c_write(PCA9538A_OutputInitValue, ID);	// data to port
+    //si on veux configurer le moteur M2
+    if (ID == 0xBF805300)
+    {
+        i2c_write(PCA9538A_OutputInitValue_M2, ID);	// data to port
+    }
+    else
+    {
+        i2c_write(PCA9538A_OutputInitValue, ID);	// data to port
+    }
     i2c_stop(ID);               //Stop
     
     //Toutes les IO en sorties
@@ -75,15 +84,7 @@ void I2C_WriteGPIO_PCA95( uint32_t ID , uint8_t *Step, uint8_t Taille)
     i2c_write(PCA9538A_pt_Output, ID);	// sélection ptr. output.
     for ( i = 0; i < Taille; i++) //Ecrire chaque data du tableau
     {
-        if(BoutonPlus ()|| BoutonMinus ())
-        { 
-            i = Taille;
-        }
-        else
-        {
-            i2c_write(Step[i], ID); //ecrire les datas pour definir l'etat des pin
-            delay_ms(10);
-        }
+        i2c_write(Step[i], ID); //ecrire les datas pour definir l'etat des pin  
     }    
     i2c_stop(ID);               //Stop
 } //I2C_WriteGPIO_PCA95
@@ -92,9 +93,9 @@ void I2C_WriteGPIO_PCA95( uint32_t ID , uint8_t *Step, uint8_t Taille)
 // Fonction I2C_WriteGPIO_PCA95
 // Description: Fonction permettant de definir l'etat des pin du PCA95 (Low,Hight) 
 //              
-// Entrées: I2C_ID, Valeur, taille du tableau
+// Entrées: I2C_ID, Valeur des Pin du I/O experder souhaité
 // Sorties: -
-void I2C_WriteGPIO_UnData_PCA95( uint32_t ID , uint8_t Step)
+void I2C_Write_Data_PCA95( uint32_t ID , uint8_t Step)
 {
     i2c_start(ID);              //Start
     i2c_write(PCA9538A_wr, ID);	// adresse + écriture
@@ -130,30 +131,4 @@ uint32_t ID_I2C_M(uint8_t Num_Mot)
     }
     return ID_I2C; //retourner la valeur de ID
 }
-
-//---------------------------------------------------------------------------------	
-// Fonction INIT_MOTEUR
-// Description: Fonction permettant d'initialiser les pins necessaire à la gestion 
-//              des moteurs
-// Entrées: -
-// Sorties: -
-//int16_t I2C_ReadGPIO_PCA95( uint32_t ID)
-//{
-//    //Déclaration des variables
-//    uint8_t msb = 1;
-//    uint8_t lsb = 1;
-//    int16_t RawTemp;
-//
-//    // BSP_LEDOn(BSP_LED_6);  // provisoire : pour observation
-//    i2c_start(ID);
-//    i2c_write(PCA9538A_rd, ID);	// adresse + lecture
-//    msb = i2c_read(1, ID); 	// ack
-//    lsb = i2c_read(0, ID);	// no ack
-//    i2c_stop(ID);
-//    // BSP_LEDOff(BSP_LED_6);  // provisoire : pour observation
-//    RawTemp = msb;
-//    RawTemp = RawTemp << 8;
-//    RawTemp = RawTemp | lsb;
-//    return RawTemp;
-//} // end I2C_ReadRawTempLM92
 

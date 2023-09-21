@@ -19,26 +19,31 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "app.h"
-#include "GestI2cMIKROE-stepper.h"
+#include "Mc32Delays.h"
 #include "driver/tmr/drv_tmr_static.h"
 #include "peripheral/oc/plib_oc.h"
-#include "Mc32Delays.h"
-#include "Mc32Delays.h"
 
 // *****************************************************************************
 // *****************************************************************************
 // Section: Type Definitions
 // *****************************************************************************
 // *****************************************************************************
-#define RapportPWM_pc 90 //rapport cyclique en poucent pour l'intencité de la LED
-#define MAX_Step_M2 40 //nombre de STEP max avant de devoir bouger M1
-#define MAX_Step_M1 4 //nombre de STEP max avant de devoir bouger M2
+#define RapportPWM_pc 10 //rapport cyclique en poucent pour controler l'intencité de la LED
+#define MAX_Step_M2 250 //nombre de STEP max pour M2 avant de devoir faire tourner M1
+#define MAX_Step_M1 1 //nombre de STEP max pour M1 avant de devoir bouger M2
+#define NBR_ETAPE_STEP_M3 16 //defini le nomre d'etape avant que le moteur réalise pour faire un step
+#define NBR_ETAPE_STEP_M2 8 //defini le nomre d'etape avant que le moteur réalise pour faire un step
+#define NBR_ETAPE_STEP_M1 16 //defini le nomre d'etape avant que le moteur réalise pour faire un step
 
 //Déclatation de tableau externe
+//tableau pour réaliser des STEP
 extern uint8_t Step_Positif[4];
-extern uint8_t Step_Negatif[4];
+//tableau pour réaliser des Half STEP
+extern uint8_t Half_Step_Positif[8];
+//tableau pour réaliser des Quarter STEP
+extern uint8_t Quarter_Step_Positif[16];
 
-//Enumeration machine d'etat Gestion des moteurs
+//Enumeration: machine d'etat Gestion des moteurs
 typedef enum
 {
 	/* Application's state machine's initial state. */
@@ -47,6 +52,14 @@ typedef enum
     STATE_MOTEUR_M2,
             
 } STATES_MODE_Moteur;
+
+//Structure permettant de compter à quel étape sont les moteurs sont pour faire un step
+typedef struct {
+            uint8_t M1;             // moteur 1
+            uint8_t M2;             // moteur 2
+            uint8_t M3;             // Moteur 3
+
+} S_VAL_STEP;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -74,5 +87,16 @@ void Mode_Rembobinage(void);
 //---------------------------------------------------------------------------------	
 // Fonction OnOff_VentilETLED:  Fonction permettant d'allumer et etteindre la LED et le vetillateur
 void OnOff_VentilETLED(bool Etat);
-
+//---------------------------------------------------------------------------------	
+// Fonction Half_Step_M3: Fonction permettant la configuration des pin pour avancer en half step pour M3
+void Half_Step_M3(uint8_t Numero_StepM3);
+//---------------------------------------------------------------------------------	
+// Fonction Quarter_Step_M3: Fonction permettant la configuration des pin pour avancer en quarter step pour M3
+void Quarter_Step_M3(uint8_t Numero_StepM3);
+//---------------------------------------------------------------------------------	
+// Fonction Half_Step_M1: Fonction permettant la configuration des pin pour avancer en half step pour M1
+void Half_Step_M1(uint8_t Numero_StepM1);
+//---------------------------------------------------------------------------------	
+// Fonction Quarter_Step_M1: Fonction permettant la configuration des pin pour avancer en quarter step pour M1
+void Quarter_Step_M1(uint8_t Numero_StepM1);
 #endif

@@ -117,8 +117,6 @@ void APP_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
     appData.state = APP_STATE_INIT;
-
-    
     /* TODO: Initialize your application's state machine and other
      * parameters.
      */
@@ -143,30 +141,27 @@ void APP_Tasks ( void )
         case APP_STATE_INIT:
         {
             //Initaliser la configuration des I2C des MIKROE
-            //I2C_InitMoteur(ID_I2C_M(Moteur_3));
-            //I2C_InitMoteur(ID_I2C_M(Moteur_2));
-            //I2C_InitMoteur(ID_I2C_M(Moteur_1));
+            I2C_InitMoteur(ID_I2C_M(Moteur_3));
+            I2C_InitMoteur(ID_I2C_M(Moteur_2));
+            I2C_InitMoteur(ID_I2C_M(Moteur_1));
             //initaliser les moteur (Pin Reset à 1)
-            //INIT_MOTEUR();	
-            
+            INIT_MOTEUR();			
             //initialisation des boutons
             BoutonInit();
-            
             // Activer les timers 
             DRV_TMR0_Start();
             DRV_TMR1_Start();
             //start OC
             DRV_OC0_Start();
-
             //changement d'état de la machine d'état
-            APP_UpdateState( APP_STATE_WAIT);
+            APP_UpdateState(APP_STATE_WAIT);
             break;
         }
         
         case APP_STATE_WAIT :
         {
             //si il ya eu une interuption...
-            if ( Flag_interrupt == true)
+            if (Flag_interrupt == true)
             {
                 //mettre le flag interupt à false
                 Flag_interrupt= false;
@@ -180,15 +175,12 @@ void APP_Tasks ( void )
         {
             //Fonction permettant le choix du mode de fonctionnement 
             GEST_Mode();
-            
             //changement d'état de la machine d'état
             APP_UpdateState(APP_STATE_WAIT);
             break;
         }
 
         /* TODO: implement your application state machine.*/
-        
-
         /* The default state should never be executed. */
         default:
         {
@@ -206,6 +198,7 @@ void APP_Tasks ( void )
 
 void APP_UpdateState ( APP_STATES NewState )
 {
+    //metre à jour la variable controlant la machie d'état
     appData.state = NewState;
 }
 

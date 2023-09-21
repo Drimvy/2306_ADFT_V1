@@ -132,7 +132,7 @@
       <Template dnOrder="2">
         <Name dnOrder="0">system_init.c</Name>
         <Path dnOrder="1">Source&amp;#160;Files/app/system_config/default</Path>
-        <Checksum dnOrder="2">54D3CE83E6F8A5C4EF6744B7A76D339E</Checksum>
+        <Checksum dnOrder="2">6C48B55A8AB3F19D6E34682DA884E79C</Checksum>
       </Template>
       <Template dnOrder="3">
         <Name dnOrder="0">drv_oc_static.h</Name>
@@ -195,7 +195,7 @@
       <Template dnOrder="15">
         <Name dnOrder="0">system_config.h</Name>
         <Path dnOrder="1">Header&amp;#160;Files/app/system_config/default</Path>
-        <Checksum dnOrder="2">95E2863C6AE2A9DC11CF4ACCE74B5628</Checksum>
+        <Checksum dnOrder="2">E4EB94EF0FD7EBA34171224C07DD40E3</Checksum>
       </Template>
       <Template dnOrder="16">
         <Name dnOrder="0">app.h</Name>

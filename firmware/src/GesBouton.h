@@ -19,6 +19,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "Mc32Debounce.h"
 
 
 //structure de la valeur des boutons
@@ -29,13 +30,7 @@ typedef struct {
 
 } S_BTN_Descriptor;
 
-//structure de la valeur des boutons
-typedef struct {
-            uint8_t Up : 1;             // événement incrément
-            uint8_t Down : 1;             // événement décrément
 
-
-} S_SW_Descriptor;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -58,12 +53,6 @@ bool BoutonMinus    (void);
 // Fonction BoutonIsOK: Indique la valeur du bouton OK
 bool BoutonIsOK    (void);
 //---------------------------------------------------------------------------------	
-// Fonction BoutonIsOK: Indique la valeur du bouton OK
-bool SwitchUp     (void);
-//---------------------------------------------------------------------------------	
-// Fonction BoutonIsOK: Indique la valeur du bouton OK
-bool SwitchDown    (void);
-//---------------------------------------------------------------------------------	
 // Fonction BoutonClearPlus: Clear valeur bouton incrémentation
 void BoutonClearPlus   (void);
 //---------------------------------------------------------------------------------	
@@ -72,12 +61,7 @@ void BoutonClearMinus   (void);
 //---------------------------------------------------------------------------------	
 // Fonction BoutonClearOK: Clear valeur bouton OK
 void BoutonClearOK   (void);
-//---------------------------------------------------------------------------------	
-// Fonction BoutonClearMinus: Clear valeur bouton décrémentation
-void SwitchClearUp   (void);
-//---------------------------------------------------------------------------------	
-// Fonction BoutonClearOK: Clear valeur bouton OK
-void SwitchClearDown   (void);
+
 
 
 #endif

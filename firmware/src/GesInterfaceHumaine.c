@@ -238,6 +238,8 @@ void GEST_Mode(void)
             //Si un des boutons d'incrémentation ou d'décrementation est actif
             if (BoutonPlus ()|| BoutonMinus ())
             {
+                //Eteindre la LED et son refroidissement
+                OnOff_VentilETLED(0);
                 //Si le bouton + est appuyer
                 if (BoutonPlus ())
                 {
@@ -267,6 +269,8 @@ void GEST_Mode(void)
             //Si un des boutons d'incrémentation ou d'décrementation est actif
             if (BoutonPlus ()|| BoutonMinus ())
             {
+                //Eteindre la LED et son refroidissement
+                OnOff_VentilETLED(0);
                 //Si le bouton + est appuyer
                 if (BoutonPlus ())
                 {
@@ -296,6 +300,8 @@ void GEST_Mode(void)
             //Si un des boutons d'incrémentation ou d'décrementation est actif
             if (BoutonPlus ()|| BoutonMinus ())
             {
+                //Eteindre la LED et son refroidissement
+                OnOff_VentilETLED(0);
                 //Si le bouton + est appuyer
                 if (BoutonPlus ())
                 {
@@ -325,6 +331,8 @@ void GEST_Mode(void)
             //Si un des boutons d'incrémentation ou d'décrementation est actif
             if (BoutonPlus ()|| BoutonMinus ())
             {
+                //Eteindre la LED et son refroidissement
+                OnOff_VentilETLED(0);
                 //Si le bouton + est appuyer
                 if (BoutonPlus ())
                 {
@@ -354,6 +362,8 @@ void GEST_Mode(void)
             //Si un des boutons d'incrémentation ou d'décrementation est actif
             if (BoutonPlus ()|| BoutonMinus ())
             {
+                //Eteindre la LED et son refroidissement
+                OnOff_VentilETLED(0);
                 //Si le bouton + est appuyer
                 if (BoutonPlus ())
                 {

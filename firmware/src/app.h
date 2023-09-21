@@ -60,7 +60,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_definitions.h"
 #include "GestI2cMIKROE-stepper.h"
 #include "GesInterfaceHumaine.h"
+#include "GesMoteur.h"
 #include "GesBouton.h"
+
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility

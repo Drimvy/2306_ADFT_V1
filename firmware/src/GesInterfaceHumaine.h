@@ -30,7 +30,7 @@
 // Section: Type Definitions
 // *****************************************************************************
 // *****************************************************************************
-#define Val_Compteur 50 //periode de 1s pour le clignottement des LED et un r.c. de 50% 
+#define Val_Compteur 100 //periode de 1s pour le clignottement des LED et un r.c. de 50% 
 
 //Enumeration machine d'etat interface humaine
 typedef enum
