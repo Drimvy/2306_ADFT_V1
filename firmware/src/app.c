@@ -173,6 +173,7 @@ void APP_Tasks ( void )
 
         case APP_STATE_SERVICE_TASKS:
         {
+            LED_TestOn();
             //Fonction permettant le choix du mode de fonctionnement 
             GEST_Mode();
             //changement d'état de la machine d'état

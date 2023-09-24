@@ -144,8 +144,24 @@ build/default/production/_ext/1360937237/app.o: ../src/app.c ../src/app.h \
  ../../../../../framework/peripheral/ports/processor/../templates/ports_ChangeNoticeEdgeStatus_Unsupported.h \
  ../../../../../framework/peripheral/ports/plib_ports_compatibility.h \
  ../src/app.h ../src/GestI2cMIKROE-stepper.h ../src/GesMoteur.h \
- ../src/Mc32Delays.h ../src/Mc32_I2cUtilCCS.h \
- ../src/GesInterfaceHumaine.h ../src/GesBouton.h ../src/Mc32Debounce.h
+ ../src/Mc32Delays.h ../../../../../framework/peripheral/oc/plib_oc.h \
+ ../../../../../framework/peripheral/oc/processor/oc_processor.h \
+ ../../../../../framework/peripheral/oc/processor/oc_p32xxxx.h \
+ ../../../../../framework/peripheral/oc/processor/oc_p32mx795f512h.h \
+ ../../../../../framework/peripheral/oc/processor/../templates/oc_EnableControl_Default.h \
+ ../../../../../framework/peripheral/oc/processor/../templates/oc_Registers.h \
+ ../../../../../framework/peripheral/oc/processor/../templates/oc_StopInIdle_Default.h \
+ ../../../../../framework/peripheral/oc/processor/../templates/oc_FaultInput_Default.h \
+ ../../../../../framework/peripheral/oc/processor/../templates/oc_FaultStatus_Default.h \
+ ../../../../../framework/peripheral/oc/processor/../templates/oc_TimerSelect_Default.h \
+ ../../../../../framework/peripheral/oc/processor/../templates/oc_AlternateClock_Unsupported.h \
+ ../../../../../framework/peripheral/oc/processor/../templates/oc_AlternateTimerSelect_Unsupported.h \
+ ../../../../../framework/peripheral/oc/processor/../templates/oc_BufferValue_32Bit_Variant.h \
+ ../../../../../framework/peripheral/oc/processor/../templates/oc_PulseWidth_32Bit_Variant.h \
+ ../../../../../framework/peripheral/oc/processor/../templates/oc_BufferSize_Default.h \
+ ../../../../../framework/peripheral/oc/processor/../templates/oc_CompareModeSelect_Default.h \
+ ../src/Mc32_I2cUtilCCS.h ../src/GesInterfaceUtilisateur.h \
+ ../src/GesBouton.h ../src/Mc32Debounce.h
 
 ../src/app.h:
 
@@ -445,9 +461,41 @@ build/default/production/_ext/1360937237/app.o: ../src/app.c ../src/app.h \
 
 ../src/Mc32Delays.h:
 
+../../../../../framework/peripheral/oc/plib_oc.h:
+
+../../../../../framework/peripheral/oc/processor/oc_processor.h:
+
+../../../../../framework/peripheral/oc/processor/oc_p32xxxx.h:
+
+../../../../../framework/peripheral/oc/processor/oc_p32mx795f512h.h:
+
+../../../../../framework/peripheral/oc/processor/../templates/oc_EnableControl_Default.h:
+
+../../../../../framework/peripheral/oc/processor/../templates/oc_Registers.h:
+
+../../../../../framework/peripheral/oc/processor/../templates/oc_StopInIdle_Default.h:
+
+../../../../../framework/peripheral/oc/processor/../templates/oc_FaultInput_Default.h:
+
+../../../../../framework/peripheral/oc/processor/../templates/oc_FaultStatus_Default.h:
+
+../../../../../framework/peripheral/oc/processor/../templates/oc_TimerSelect_Default.h:
+
+../../../../../framework/peripheral/oc/processor/../templates/oc_AlternateClock_Unsupported.h:
+
+../../../../../framework/peripheral/oc/processor/../templates/oc_AlternateTimerSelect_Unsupported.h:
+
+../../../../../framework/peripheral/oc/processor/../templates/oc_BufferValue_32Bit_Variant.h:
+
+../../../../../framework/peripheral/oc/processor/../templates/oc_PulseWidth_32Bit_Variant.h:
+
+../../../../../framework/peripheral/oc/processor/../templates/oc_BufferSize_Default.h:
+
+../../../../../framework/peripheral/oc/processor/../templates/oc_CompareModeSelect_Default.h:
+
 ../src/Mc32_I2cUtilCCS.h:
 
-../src/GesInterfaceHumaine.h:
+../src/GesInterfaceUtilisateur.h:
 
 ../src/GesBouton.h:
 

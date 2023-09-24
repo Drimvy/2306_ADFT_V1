@@ -67,15 +67,16 @@ void INIT_MOTEUR(void)
 // Sorties: -
 void Mode_Normal(void)
 {
+    
     //Déclatation de varable local 
     //Initaliser la machine d'état en static en mode STATE_MOTEUR_M3
     static STATES_MODE_Moteur Val_Mode_Moteur = STATE_MOTEUR_M3;
     //varible compteur de step
     static uint16_t Nbr_Step_M2 = 500;
     static uint8_t Nbr_Step_M1 = 0;
-
-    //uint8_t Step_Positif[4] = {0x46, 0x44, 0x40, 0x42}; //moteur tourne dans le sens horaire
-    //uint8_t Half_Step_Positif[8] = {0x46,0x06, 0x44, 0x44, 0x40, 0x00, 0x42, 0x42}; //moteur tourne dans le sens horaire
+    static uint8_t deuxtour = 0;
+    uint8_t Step_Positif[4] = {0x46, 0x44, 0x40, 0x42}; //moteur tourne dans le sens horaire
+    uint8_t Half_Step_Positif[8] = {0x46,0x06, 0x44, 0x44, 0x40, 0x00, 0x42, 0x42}; //moteur tourne dans le sens horaire
     uint8_t Quarter_Step_Positif[16] = {0x06,0x46,0x06,0x44,0x04,0x44,0x44,0x40,0x00,0x40,0x00,0x42,0x02,0x42,0x42,0x46}; //moteur tourne dans le sens horaire
     switch(Val_Mode_Moteur)
     {
@@ -142,6 +143,7 @@ void Mode_Normal(void)
                     }
                     else
                     {
+                        deuxtour ++;
                         //mettre la valeur du compteur à 0
                         Nbr_Step_M2 = MAX_Step_M2;
                         //éteindre la LED et le ventillateur
@@ -191,10 +193,13 @@ void Mode_Normal(void)
                 }
                 else
                 {
+                    
                     //mettre la valeur du compteur à 0
                     Nbr_Step_M1 = 0;
                     //Changer d'état (faire tourner le moteur M2)
                     Val_Mode_Moteur = STATE_MOTEUR_M2;
+                    
+                    
                 }
             }
             
@@ -275,7 +280,7 @@ void OnOff_VentilETLED(bool Etat)
         CTRL_VentilOff();
         //Calcul du rapport de la pulse, (inversion du PWM ), 
         //entrer la valeur du PWM voulu en poucent sur le define: RapportPWM_pc
-        PeriodeTimer3 = PeriodeTimer3 * (100-RapportPWM_pc)/100;
+        PeriodeTimer3 = PeriodeTimer3 * (100-RapCyclPWM_pc)/100;
         //MAJ de la pulse du PWM 
         DRV_OC0_PulseWidthSet( PeriodeTimer3);
     }
@@ -648,3 +653,4 @@ void Quarter_Step_M1(uint8_t Numero_Step_M1)
         break;
     }
 }
+

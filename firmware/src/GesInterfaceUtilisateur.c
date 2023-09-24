@@ -13,7 +13,7 @@
 // Section: Included Files
 // *****************************************************************************
 // *****************************************************************************
-#include "GesInterfaceHumaine.h"
+#include "GesInterfaceUtilisateur.h"
 
 //---------------------------------------------------------------------------------	
 // Fonction GEST_Mode
@@ -34,18 +34,18 @@ void GEST_Mode(void)
     switch(valSTATES_Mode)
     {
         case STATE_SELECT_MODE_NORMAL:
-            //Si le compteur = 0
-            if (Compteur_Clignot == 0)
+            //Si le compteur est inférieur à 99
+            if (Compteur_Clignot < 99)
+            {
+                //incrémenter la valeur du compteur
+                Compteur_Clignot ++;
+            }
+            else
             {
                 //Toggle la LED mode normal 
                 LED_NormalToggle();
                 //mettre à jour la valeur du compteur
                 Compteur_Clignot = Val_Compteur ;
-            }
-            else
-            {
-                //incrémenter la valeur du compteur
-                Compteur_Clignot--;
             }
             //Si un des boutons est actif
             if (BoutonPlus ()|| BoutonMinus ()||BoutonIsOK ())
@@ -73,18 +73,18 @@ void GEST_Mode(void)
         break;
         
         case STATE_SELECT_AVANCE_RAPIDE:
-            //Si le compteur = 0
-            if (Compteur_Clignot == 0)
+            //Si le compteur est inférieur à 99
+            if (Compteur_Clignot < 99)
             {
-                //Toggle la LED mode avance rapide
-                LED_ARToggle();
-                //mettre à jour la valeur du compteur
-                Compteur_Clignot = Val_Compteur;
+                //incrémenter la valeur du compteur
+                Compteur_Clignot ++;
             }
             else
             {
-                //incrémenter la valeur du compteur
-                Compteur_Clignot--;
+                //Toggle la LED mode normal 
+                LED_ARToggle();
+                //mettre à jour la valeur du compteur
+                Compteur_Clignot = Val_Compteur ;
             }
             //Si un des boutons est actif
             if (BoutonPlus ()|| BoutonMinus ()||BoutonIsOK ())
@@ -113,18 +113,18 @@ void GEST_Mode(void)
         break;
         
         case STATE_SELECT_AVANCE_LENTE:
-            //Si le compteur = 0
-            if (Compteur_Clignot == 0)
+            //Si le compteur est inférieur à 99
+            if (Compteur_Clignot < 99)
             {
-                //Toggle la LED avance lente
-                LED_ALToggle();
-                //mettre à jour la valeur du compteur
-                Compteur_Clignot = Val_Compteur;
+                //incrémenter la valeur du compteur
+                Compteur_Clignot ++;
             }
             else
             {
-                //incrémenter la valeur du compteur
-                Compteur_Clignot--;
+                //Toggle la LED mode normal 
+                LED_ALToggle();
+                //mettre à jour la valeur du compteur
+                Compteur_Clignot = Val_Compteur ;
             }
             //Si un des boutons est actif
             if (BoutonPlus ()|| BoutonMinus ()||BoutonIsOK ())
@@ -153,18 +153,18 @@ void GEST_Mode(void)
         break;
         
         case STATE_SELECT_RETOUR_LENT:
-            //Si le compteur = 0
-            if (Compteur_Clignot == 0)
+            //Si le compteur est inférieur à 99
+            if (Compteur_Clignot < 99)
             {
-                //Toggle la LED 
-                LED_RLToggle();
-                //mettre à jour la valeur du compteur
-                Compteur_Clignot = Val_Compteur;
+                //incrémenter la valeur du compteur
+                Compteur_Clignot ++;
             }
             else
             {
-                //incrémenter la valeur du compteur
-                Compteur_Clignot--;
+                //Toggle la LED mode normal 
+                LED_RLToggle();
+                //mettre à jour la valeur du compteur
+                Compteur_Clignot = Val_Compteur ;
             }
             //Si un des boutons est actif
             if (BoutonPlus ()|| BoutonMinus ()||BoutonIsOK ())
@@ -193,18 +193,18 @@ void GEST_Mode(void)
         break;
         
         case STATE_SELECT_REMBOBINAGE:
-            //Si le compteur = 0
-            if (Compteur_Clignot == 0)
+            //Si le compteur est inférieur à 99
+            if (Compteur_Clignot < 99)
             {
-                //Toggle la LED
-                LED_RembobinageToggle();
-                //mettre à jour la valeur du compteur
-                Compteur_Clignot = Val_Compteur;
+                //incrémenter la valeur du compteur
+                Compteur_Clignot ++;
             }
             else
             {
-                //incrémenter la valeur du compteur
-                Compteur_Clignot--;
+                //Toggle la LED mode normal 
+                LED_RembobinageToggle();
+                //mettre à jour la valeur du compteur
+                Compteur_Clignot = Val_Compteur ;
             }
             //Si un des boutons est actif
             if (BoutonPlus ()|| BoutonMinus ()||BoutonIsOK ())

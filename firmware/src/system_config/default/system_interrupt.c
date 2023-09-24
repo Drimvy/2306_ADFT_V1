@@ -62,7 +62,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system/common/sys_common.h"
 #include "app.h"
 #include "system_definitions.h"
-#include "GesInterfaceHumaine.h"
+#include "GesInterfaceUtilisateur.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -74,14 +74,15 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 void __ISR(_TIMER_1_VECTOR, ipl3AUTO) IntHandlerDrvTmrInstance0(void)
 {
     //allumer la LED de test
-    LED_TestOn();
+    //LED_TestOn();
     //initalisation du compteur pour entrer dans l'etat service task
     static uint16_t Compteur_Service_Tasks= 0; 
     //lire la valeur des boutons à chaque interuption
     ScanBTN (BTN_PlusStateGet(), BTN_MoinsStateGet(), BTN_OKStateGet(),FinCourse_UpStateGet(),FinCourse_DownStateGet());
     //entrer dans le l'etat service task toute les 5ms (Machine d'état app.c)
-    if (Compteur_Service_Tasks >= 5)
+    if (Compteur_Service_Tasks >= 4)
     {   
+        
         //Mettre le compteur à 0
         Compteur_Service_Tasks = 0;
         //mettre le flag à true

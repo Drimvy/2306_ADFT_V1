@@ -28,7 +28,7 @@
 // Section: Type Definitions
 // *****************************************************************************
 // *****************************************************************************
-#define RapportPWM_pc 10 //rapport cyclique en poucent pour controler l'intencité de la LED
+#define RapCyclPWM_pc 100 //rapport cyclique en poucent pour controler l'intencité de la LED
 #define MAX_Step_M2 250 //nombre de STEP max pour M2 avant de devoir faire tourner M1
 #define MAX_Step_M1 1 //nombre de STEP max pour M1 avant de devoir bouger M2
 #define NBR_ETAPE_STEP_M3 16 //defini le nomre d'etape avant que le moteur réalise pour faire un step

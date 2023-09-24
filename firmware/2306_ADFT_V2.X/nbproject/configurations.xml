@@ -31,12 +31,12 @@
         </logicalFolder>
         <itemPath>../src/app.h</itemPath>
         <itemPath>../src/GesBouton.h</itemPath>
-        <itemPath>../src/GesInterfaceHumaine.h</itemPath>
         <itemPath>../src/GesMoteur.h</itemPath>
         <itemPath>../src/GestI2cMIKROE-stepper.h</itemPath>
         <itemPath>../src/Mc32Debounce.h</itemPath>
         <itemPath>../src/Mc32_I2cUtilCCS.h</itemPath>
         <itemPath>../src/Mc32Delays.h</itemPath>
+        <itemPath>../src/GesInterfaceUtilisateur.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="framework" projectFiles="true">
         <logicalFolder name="f1" displayName="driver" projectFiles="true">
@@ -143,12 +143,12 @@
         <itemPath>../src/app.c</itemPath>
         <itemPath>../src/main.c</itemPath>
         <itemPath>../src/GesBouton.c</itemPath>
-        <itemPath>../src/GesInterfaceHumaine.c</itemPath>
         <itemPath>../src/GesMoteur.c</itemPath>
         <itemPath>../src/GestI2cMIKROE-stepper.c</itemPath>
         <itemPath>../src/Mc32Debounce.c</itemPath>
         <itemPath>../src/Mc32_I2cUtilCCS.c</itemPath>
         <itemPath>../src/Mc32Delays.c</itemPath>
+        <itemPath>../src/GesInterfaceUtilisateur.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="framework" projectFiles="true">
         <logicalFolder name="f1" displayName="system" projectFiles="true">

@@ -59,7 +59,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 #include "GestI2cMIKROE-stepper.h"
-#include "GesInterfaceHumaine.h"
+#include "GesInterfaceUtilisateur.h"
 #include "GesMoteur.h"
 #include "GesBouton.h"
 
