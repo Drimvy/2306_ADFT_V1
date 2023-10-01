@@ -1,4 +1,4 @@
-// GesInterfaceHumaine.c
+// GesInterfaceUtilisateur.c
 //
 //	Description : Gestion du choix du mode de fonctionnement du système
 //	Auteur 		: C-Mieville
@@ -289,7 +289,7 @@ void GEST_Mode(void)
             else
             {
                 //fonction permettant de faire tourner le système dans le mode avance rapide
-                //Mode_Avance_Rapide();
+                Mode_Avance_Rapide();
             }
             
         break;
@@ -320,7 +320,7 @@ void GEST_Mode(void)
             else
             {
                 //fonction permettant de faire tourner le système dans le mode avance lente
-                //Mode_Avance_Lente();
+                Mode_Avance_Lente();
             }
             
         break;
@@ -351,7 +351,7 @@ void GEST_Mode(void)
             else
             {
                 //fonction permettant de faire tourner le système dans le mode retour lent
-                //Mode_Retour_Lent();
+                Mode_Retour_Lent();
             }
             
         break;
@@ -382,7 +382,7 @@ void GEST_Mode(void)
             else
             {
                 //fonction permettant de faire tourner le système dans le mode rembobinage
-                //Mode_Rembobinage();
+                Mode_Rembobinage();
             }
             
         break;

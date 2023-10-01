@@ -28,8 +28,8 @@
 // Section: Type Definitions
 // *****************************************************************************
 // *****************************************************************************
-#define RapCyclPWM_pc 100 //rapport cyclique en poucent pour controler l'intencité de la LED
-#define MAX_Step_M2 250 //nombre de STEP max pour M2 avant de devoir faire tourner M1
+#define RapCyclPWM_pc 7 //rapport cyclique en poucent pour controler l'intencité de la LED
+#define MAX_Step_M2 250 //nombre de STEP max pour M2 avant de devoir faire tourner M1 250
 #define MAX_Step_M1 1 //nombre de STEP max pour M1 avant de devoir bouger M2
 #define NBR_ETAPE_STEP_M3 16 //defini le nomre d'etape avant que le moteur réalise pour faire un step
 #define NBR_ETAPE_STEP_M2 8 //defini le nomre d'etape avant que le moteur réalise pour faire un step
@@ -53,13 +53,7 @@ typedef enum
             
 } STATES_MODE_Moteur;
 
-//Structure permettant de compter à quel étape sont les moteurs sont pour faire un step
-typedef struct {
-            uint8_t M1;             // moteur 1
-            uint8_t M2;             // moteur 2
-            uint8_t M3;             // Moteur 3
 
-} S_VAL_STEP;
 
 // *****************************************************************************
 // *****************************************************************************

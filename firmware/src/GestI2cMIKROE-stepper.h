@@ -39,6 +39,7 @@
 #define PCA9538A_ConfigInitValue 0x00   //Valeur pour configurer toute les pin du I/O expender en sortie
 #define PCA9538A_OutputInitValue_M2 0x02    //Valeur initialiser pour le mode fonctionnement M2 (Half step)
 
+
 #define I2C_M1  I2C_ID_4 //ID 1
 #define I2C_M2  I2C_ID_1 //ID 2
 #define I2C_M3  I2C_ID_5 //ID 3

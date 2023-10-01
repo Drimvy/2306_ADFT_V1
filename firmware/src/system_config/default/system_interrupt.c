@@ -74,7 +74,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 void __ISR(_TIMER_1_VECTOR, ipl3AUTO) IntHandlerDrvTmrInstance0(void)
 {
     //allumer la LED de test
-    //LED_TestOn();
+    LED_TestOn();
     //initalisation du compteur pour entrer dans l'etat service task
     static uint16_t Compteur_Service_Tasks= 0; 
     //lire la valeur des boutons à chaque interuption

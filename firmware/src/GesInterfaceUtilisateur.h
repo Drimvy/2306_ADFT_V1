@@ -1,7 +1,7 @@
-#ifndef GesInterfaceHumaine_h
-#define GesInterfaceHumaine_h
+#ifndef GesInterfaceUtilisateur_h
+#define GesInterfaceUtilisateur_h
 
-// GesInterfaceHumaine.h
+// GesInterfaceUtilisateur.h
 // C. Mieville    11/09/2023
 //
 // Fonctions pour la gestion du choix de mode de fonctionnement du système
@@ -32,7 +32,7 @@
 // *****************************************************************************
 #define Val_Compteur 0 //periode de 1s pour le clignottement des LED et un r.c. de 50% 
 
-//Enumeration machine d'etat interface humaine
+//Enumeration machine d'etat interface uilisateur
 typedef enum
 {
 	/* Application's state machine's initial state. */

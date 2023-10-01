@@ -15,9 +15,11 @@
 // *****************************************************************************
 #include "GesMoteur.h"
 
-//initaliser la variable de la structure
-S_VAL_STEP Etape_Step;
 
+static uint16_t Nbr_Step_M2 = 500; //500
+uint8_t Step_Positif[4] = {0x46, 0x44, 0x40, 0x42}; //moteur tourne dans le sens horaire
+uint8_t Half_Step_Positif[8] = {0x46,0x06, 0x44, 0x44, 0x40, 0x00, 0x42, 0x42}; //moteur tourne dans le sens horaire
+uint8_t Quarter_Step_Positif[16] = {0x06,0x46,0x06,0x44,0x04,0x44,0x44,0x40,0x00,0x40,0x00,0x42,0x02,0x42,0x42,0x46}; //moteur tourne dans le sens horaire
 //---------------------------------------------------------------------------------	
 // Fonction INIT_MOTEUR
 // Description: Fonction permettant d'initialiser les pins necessaire à la gestion 
@@ -52,10 +54,7 @@ void INIT_MOTEUR(void)
     INB1_M1On();
     INB2_M1On();
     
-    //valeur pour init de la structure
-    Etape_Step.M1 = 0;
-    Etape_Step.M2 = 0;
-    Etape_Step.M3 = 6;
+    
 }
 
 //---------------------------------------------------------------------------------	
@@ -67,17 +66,20 @@ void INIT_MOTEUR(void)
 // Sorties: -
 void Mode_Normal(void)
 {
-    
+    Rot_Dir_M2Off();//sense anti horaire
     //Déclatation de varable local 
     //Initaliser la machine d'état en static en mode STATE_MOTEUR_M3
     static STATES_MODE_Moteur Val_Mode_Moteur = STATE_MOTEUR_M3;
     //varible compteur de step
-    static uint16_t Nbr_Step_M2 = 500;
+    
     static uint8_t Nbr_Step_M1 = 0;
-    static uint8_t deuxtour = 0;
-    uint8_t Step_Positif[4] = {0x46, 0x44, 0x40, 0x42}; //moteur tourne dans le sens horaire
-    uint8_t Half_Step_Positif[8] = {0x46,0x06, 0x44, 0x44, 0x40, 0x00, 0x42, 0x42}; //moteur tourne dans le sens horaire
-    uint8_t Quarter_Step_Positif[16] = {0x06,0x46,0x06,0x44,0x04,0x44,0x44,0x40,0x00,0x40,0x00,0x42,0x02,0x42,0x42,0x46}; //moteur tourne dans le sens horaire
+    
+    //valeur pour init de la structure
+    static uint8_t Etape_Step_M1 = 6;
+    static uint8_t Etape_Step_M2 = 0;
+    static uint8_t Etape_Step_M3 = 0;
+    
+    
     switch(Val_Mode_Moteur)
     {
         case STATE_MOTEUR_M3:
@@ -92,17 +94,17 @@ void Mode_Normal(void)
             else 
             {
                 //modifier l'etat des pin INA1, INB1 et INB2
-                Quarter_Step_M3(Etape_Step.M3);
+                Quarter_Step_M3(Etape_Step_M3);
                 //moifier la valeur des port de I/O expender (controler via I2C))
-                I2C_Write_Data_PCA95(ID_I2C_M(Moteur_3), Quarter_Step_Positif[Etape_Step.M3]);
+                I2C_Write_Data_PCA95(ID_I2C_M(Moteur_3), Quarter_Step_Positif[Etape_Step_M3]);
                 //incréementer la valeur du compteur
-                Etape_Step.M3++;
+                Etape_Step_M3++;
                 //si la valeur de  Val_HalfStep est supérieur au égale à 16
                 //le moteur à fait un step complet
-                if (Etape_Step.M3 >= NBR_ETAPE_STEP_M3)
+                if (Etape_Step_M3 >= NBR_ETAPE_STEP_M3)
                 {
                     // remettre la valeur du compteurs à 0
-                    Etape_Step.M3 = 0;
+                    Etape_Step_M3 = 0;
                 }          
             }
         break;
@@ -130,20 +132,19 @@ void Mode_Normal(void)
                     if (Nbr_Step_M2 > 0)
                     {
                         //décréementer la valeur du compteur
-                        Etape_Step.M2++;
+                        Etape_Step_M2++;
                         //si la valeur de  Val_HalfStep est supérieur au égale à 8
                         //le moteur à fait un step complet
-                        if (Etape_Step.M2 >= NBR_ETAPE_STEP_M2)
+                        if (Etape_Step_M2 >= NBR_ETAPE_STEP_M2)
                         {
                             // remettre la valeur du compteurs à 0
-                            Etape_Step.M2 = 0;
+                            Etape_Step_M2 = 0;
                             //incrémenter la compteur de step
                             Nbr_Step_M2 --;
                         } 
                     }
                     else
                     {
-                        deuxtour ++;
                         //mettre la valeur du compteur à 0
                         Nbr_Step_M2 = MAX_Step_M2;
                         //éteindre la LED et le ventillateur
@@ -163,45 +164,66 @@ void Mode_Normal(void)
                 }
             }
         break;
-        
         case STATE_MOTEUR_M1:
-            if (FinCourse_DownStateGet())
+            //Si le moteur 1 à avance de moins de 4 step
+            if (Nbr_Step_M1 < MAX_Step_M1)
             {
-                //Changer d'état (faire tourner le moteur M3)
-                Val_Mode_Moteur = STATE_MOTEUR_M3;
+                //modifier l'etat des pin INA1, INB1 et INB2
+                Quarter_Step_M1(Etape_Step_M1);
+                //moifier la valeur des port de I/O expender (controler via I2C))
+                I2C_Write_Data_PCA95(ID_I2C_M(Moteur_1), Quarter_Step_Positif[Etape_Step_M1]);
+                //incréementer la valeur du compteur
+                Etape_Step_M1++;
+                //si la valeur de  Val_HalfStep est supérieur au égale à 16
+                //le moteur à fait un step complet
+                if (Etape_Step_M1 >= NBR_ETAPE_STEP_M1)
+                {
+                    // remettre la valeur du compteurs à 0
+                    Etape_Step_M1 = 0;
+                    //incrémenter la compteur de step
+                    Nbr_Step_M1 ++;
+                }          
             }
             else
-            { 
-                //Si le moteur 1 à avance de moins de 4 step
-                if (Nbr_Step_M1 < MAX_Step_M1)
-                {
-                    //modifier l'etat des pin INA1, INB1 et INB2
-                    Quarter_Step_M1(Etape_Step.M1);
-                    //moifier la valeur des port de I/O expender (controler via I2C))
-                    I2C_Write_Data_PCA95(ID_I2C_M(Moteur_1), Quarter_Step_Positif[Etape_Step.M1]);
-                    //incréementer la valeur du compteur
-                    Etape_Step.M1++;
-                    //si la valeur de  Val_HalfStep est supérieur au égale à 16
-                    //le moteur à fait un step complet
-                    if (Etape_Step.M1 >= NBR_ETAPE_STEP_M1)
-                    {
-                        // remettre la valeur du compteurs à 0
-                        Etape_Step.M1 = 0;
-                        //incrémenter la compteur de step
-                        Nbr_Step_M1 ++;
-                    }          
-                }
-                else
-                {
-                    
-                    //mettre la valeur du compteur à 0
-                    Nbr_Step_M1 = 0;
-                    //Changer d'état (faire tourner le moteur M2)
-                    Val_Mode_Moteur = STATE_MOTEUR_M2;
-                    
-                    
-                }
+            {
+                //mettre la valeur du compteur à 0
+                Nbr_Step_M1 = 0;
+                //Changer d'état (faire tourner le moteur M2)
+                Val_Mode_Moteur = STATE_MOTEUR_M2;
             }
+        
+//        case STATE_MOTEUR_M1:
+//            //Si le moteur 1 à avance de moins de 4 step
+//            if (Nbr_Step_M1 < MAX_Step_M1)
+//            {
+//                if ( Etape_Step_M1 == 0)
+//                {
+//                    //incréementer la valeur du compteur
+//                    Etape_Step_M1 = 16;  
+//                }
+//                //incréementer la valeur du compteur
+//                Etape_Step_M1 --;
+//                //modifier l'etat des pin INA1, INB1 et INB2
+//                Quarter_Step_M1(Etape_Step_M1);
+//                //moifier la valeur des port de I/O expender (controler via I2C))
+//                I2C_Write_Data_PCA95(ID_I2C_M(Moteur_1), Quarter_Step_Positif[Etape_Step_M1]);
+//                
+//                //si la valeur de  Val_HalfStep est supérieur au égale à 16
+//                //le moteur à fait un step complet
+//                if (Etape_Step_M1 <= 0)
+//                {
+//                    Nbr_Step_M1 ++;
+//                }  
+//            
+//            }
+//            else
+//            {
+//                //mettre la valeur du compteur à 0
+//                Nbr_Step_M1 = 0;
+//                //Changer d'état (faire tourner le moteur M2)
+//                Val_Mode_Moteur = STATE_MOTEUR_M2;
+//            }
+            
             
         break;   
     }
@@ -217,7 +239,79 @@ void Mode_Normal(void)
 
 void Mode_Avance_Rapide(void)
 {
+    Rot_Dir_M2Off();//sense anti horaire
+    //Déclatation de varable local 
+    //Initaliser la machine d'état en static en mode STATE_MOTEUR_M3
+    static STATES_MODE_Moteur Val_Mode_Moteur_AL = STATE_MOTEUR_M3;
+
+    static uint8_t Nbr_Step_M1 = 1;
     
+    //valeur pour init de la structure
+    static uint8_t Etape_Step_M1 = 0;
+    static uint8_t Etape_Step_M3 = 0;
+    
+    
+    switch(Val_Mode_Moteur_AL)
+    {
+        case STATE_MOTEUR_M3:
+            //Si le capteur de fin course du haut est actif 
+            if(FinCourse_UpStateGet())
+            {
+                //Changer d'état (faire tourner le moteur M1)
+                Val_Mode_Moteur_AL = STATE_MOTEUR_M1;
+
+            }
+            //sinon faire tourner le moteur 
+            else 
+            {
+                //modifier l'etat des pin INA1, INB1 et INB2
+                Quarter_Step_M3(Etape_Step_M3);
+                //moifier la valeur des port de I/O expender (controler via I2C))
+                I2C_Write_Data_PCA95(ID_I2C_M(Moteur_3), Quarter_Step_Positif[Etape_Step_M3]);
+                //incréementer la valeur du compteur
+                Etape_Step_M3++;
+                //si la valeur de  Val_HalfStep est supérieur au égale à 16
+                //le moteur à fait un step complet
+                if (Etape_Step_M3 >= NBR_ETAPE_STEP_M3)
+                {
+                    // remettre la valeur du compteurs à 0
+                    Etape_Step_M3 = 0;
+                }          
+            }
+        break;
+        
+        
+        
+        case STATE_MOTEUR_M1:
+            //Si le moteur 1 à avance de moins de 4 step
+            if (FinCourse_DownStateGet() != 1)
+            {
+                //modifier l'etat des pin INA1, INB1 et INB2
+                Quarter_Step_M1(Etape_Step_M1);
+                //moifier la valeur des port de I/O expender (controler via I2C))
+                I2C_Write_Data_PCA95(ID_I2C_M(Moteur_1), Quarter_Step_Positif[Etape_Step_M1]);
+                //incréementer la valeur du compteur
+                Etape_Step_M1++;
+                //si la valeur de  Val_HalfStep est supérieur au égale à 16
+                //le moteur à fait un step complet
+                if (Etape_Step_M1 >= NBR_ETAPE_STEP_M1)
+                {
+                    // remettre la valeur du compteurs à 0
+                    Etape_Step_M1 = 0;
+                    //incrémenter la compteur de step
+                    Nbr_Step_M1 ++;
+                }          
+            }
+            //Si le capteur de fin course du bas est actif 
+            else
+            {
+                //Changer d'état (faire tourner le moteur M3)
+                Val_Mode_Moteur_AL = STATE_MOTEUR_M3;
+            }
+            
+            
+        break; 
+    }
 }
 
 //---------------------------------------------------------------------------------	
@@ -230,7 +324,119 @@ void Mode_Avance_Rapide(void)
 
 void Mode_Avance_Lente(void)
 {
+    Rot_Dir_M2Off();//sense anti horaire
+    //Déclatation de varable local 
+    //Initaliser la machine d'état en static en mode STATE_MOTEUR_M3
+    static STATES_MODE_Moteur Val_Mode_Moteur_AL = STATE_MOTEUR_M3;
+
+    static uint8_t Nbr_Step_M1 = 1;
     
+    //valeur pour init de la structure
+    static uint8_t Etape_Step_M1 = 0;
+    static uint8_t Etape_Step_M2 = 0;
+    static uint8_t Etape_Step_M3 = 0;
+    
+    
+    switch(Val_Mode_Moteur_AL)
+    {
+        case STATE_MOTEUR_M3:
+            //Si le capteur de fin course du haut est actif 
+            if(FinCourse_UpStateGet())
+            {
+                //Changer d'état (faire tourner le moteur M2)
+                Val_Mode_Moteur_AL = STATE_MOTEUR_M2;
+
+            }
+            //sinon faire tourner le moteur 
+            else 
+            {
+                //modifier l'etat des pin INA1, INB1 et INB2
+                Quarter_Step_M3(Etape_Step_M3);
+                //moifier la valeur des port de I/O expender (controler via I2C))
+                I2C_Write_Data_PCA95(ID_I2C_M(Moteur_3), Quarter_Step_Positif[Etape_Step_M3]);
+                //incréementer la valeur du compteur
+                Etape_Step_M3++;
+                //si la valeur de  Val_HalfStep est supérieur au égale à 16
+                //le moteur à fait un step complet
+                if (Etape_Step_M3 >= NBR_ETAPE_STEP_M3)
+                {
+                    // remettre la valeur du compteurs à 0
+                    Etape_Step_M3 = 0;
+                }          
+            }
+        break;
+        
+        case STATE_MOTEUR_M2:
+            //Si le capteur de fin course du bas est actif 
+            if (FinCourse_DownStateGet())
+            {
+                //Changer d'état (faire tourner le moteur M3)
+                Val_Mode_Moteur_AL = STATE_MOTEUR_M3;
+            }
+            else
+            { 
+            //mettre le signal du clock à l'état haut
+            CLK_M2On();
+            //Si le moteur 2 à avance de moins de 4 step
+                if (Nbr_Step_M2 > 0)
+                {
+                    //décréementer la valeur du compteur
+                    Etape_Step_M2++;
+                    //si la valeur de  Val_HalfStep est supérieur au égale à 8
+                    //le moteur à fait un step complet
+                    if (Etape_Step_M2 >= NBR_ETAPE_STEP_M2)
+                    {
+                        // remettre la valeur du compteurs à 0
+                        Etape_Step_M2 = 0;
+                        //incrémenter la compteur de step
+                        Nbr_Step_M2 --;
+                    } 
+                }
+                else
+                {
+                    //mettre la valeur du compteur à 0
+                    Nbr_Step_M2 = MAX_Step_M2;
+                    //Changer d'état (faire tourner le moteur M1)
+                    Val_Mode_Moteur_AL = STATE_MOTEUR_M1;
+                }
+                //attendre 500 us (pour que le système est le temps de lire le flanc positif du clock)
+                delay_us(500);
+                //mettre le signal clock à 0
+                CLK_M2Off();           
+            }
+        break;
+        
+        case STATE_MOTEUR_M1:
+            //Si le moteur 1 à avance de moins de 4 step
+            if (Nbr_Step_M1 < MAX_Step_M1)
+            {
+                //modifier l'etat des pin INA1, INB1 et INB2
+                Quarter_Step_M1(Etape_Step_M1);
+                //moifier la valeur des port de I/O expender (controler via I2C))
+                I2C_Write_Data_PCA95(ID_I2C_M(Moteur_1), Quarter_Step_Positif[Etape_Step_M1]);
+                //incréementer la valeur du compteur
+                Etape_Step_M1++;
+                //si la valeur de  Val_HalfStep est supérieur au égale à 16
+                //le moteur à fait un step complet
+                if (Etape_Step_M1 >= NBR_ETAPE_STEP_M1)
+                {
+                    // remettre la valeur du compteurs à 0
+                    Etape_Step_M1 = 0;
+                    //incrémenter la compteur de step
+                    Nbr_Step_M1 ++;
+                }          
+            }
+            else
+            {
+                //mettre la valeur du compteur à 0
+                Nbr_Step_M1 = 0;
+                //Changer d'état (faire tourner le moteur M2)
+                Val_Mode_Moteur_AL = STATE_MOTEUR_M2;
+            }
+            
+            
+        break;   
+    }
 }
 
 //---------------------------------------------------------------------------------	
@@ -243,7 +449,126 @@ void Mode_Avance_Lente(void)
 
 void Mode_Retour_Lent(void)
 {
+    Rot_Dir_M2On();//sense anti horaire
+    //Déclatation de varable local 
+    //Initaliser la machine d'état en static en mode STATE_MOTEUR_M3
+    static STATES_MODE_Moteur Val_Mode_Moteur_RL = STATE_MOTEUR_M1;
+    //varible compteur de step
+    static uint8_t Nbr_Step_M1 = 0;
+    static uint8_t MAX_Step = 2;
+    //valeur pour init de la structure
+    static uint8_t Etape_Step_M1 = 16;
+    static uint8_t Etape_Step_M2 = 0;
+    static uint8_t Etape_Step_M3 = 16;
     
+    
+    switch(Val_Mode_Moteur_RL)
+    {
+        case STATE_MOTEUR_M3:
+            //Si le capteur de fin course du haut est actif 
+            if(FinCourse_DownStateGet())
+            {
+                //Changer d'état (faire tourner le moteur M2)
+                Val_Mode_Moteur_RL = STATE_MOTEUR_M2;
+
+            }
+            //sinon faire tourner le moteur 
+            else 
+            {
+                if ( Etape_Step_M3 == 0)
+                {
+                    //incréementer la valeur du compteur
+                    Etape_Step_M3 = 16;  
+                }
+                //incréementer la valeur du compteur
+                Etape_Step_M3 --;
+                //modifier l'etat des pin INA1, INB1 et INB2
+                Quarter_Step_M3(Etape_Step_M1);
+                //moifier la valeur des port de I/O expender (controler via I2C))
+                I2C_Write_Data_PCA95(ID_I2C_M(Moteur_3), Quarter_Step_Positif[Etape_Step_M3]);
+                        
+            }
+        break;
+        
+        case STATE_MOTEUR_M2:
+            //Si le capteur de fin course du bas est actif 
+            if (FinCourse_UpStateGet())
+            {
+                //Changer d'état (faire tourner le moteur M3)
+                Val_Mode_Moteur_RL = STATE_MOTEUR_M3;
+            }
+            else
+            { 
+            //mettre le signal du clock à l'état haut
+            CLK_M2On();
+            //Si le moteur 2 à avance de moins de 4 step
+                if (Nbr_Step_M2 > 0)
+                {
+                    //décréementer la valeur du compteur
+                    Etape_Step_M2++;
+                    //si la valeur de  Val_HalfStep est supérieur au égale à 8
+                    //le moteur à fait un step complet
+                    if (Etape_Step_M2 >= NBR_ETAPE_STEP_M2)
+                    {
+                        // remettre la valeur du compteurs à 0
+                        Etape_Step_M2 = 0;
+                        //incrémenter la compteur de step
+                        Nbr_Step_M2 --;
+                    } 
+                }
+                else
+                {
+                    //mettre la valeur du compteur à 0
+                    Nbr_Step_M2 = MAX_Step_M2;
+                    //éteindre la LED et le ventillateur
+                    OnOff_VentilETLED(0);
+                    //Changer d'état (faire tourner le moteur M1)
+                    Val_Mode_Moteur_RL = STATE_MOTEUR_M1;
+                }
+                //attendre 500 us (pour que le système est le temps de lire le flanc positif du clock)
+                delay_us(500);
+                //mettre le signal clock à 0
+                CLK_M2Off();            
+            }
+        break;
+        
+        case STATE_MOTEUR_M1:
+            //Si le moteur 1 à avance de moins de 4 step
+            if (Nbr_Step_M1 <= MAX_Step)
+            {
+                if ( Etape_Step_M1 == 0)
+                {
+                    //incréementer la valeur du compteur
+                    Etape_Step_M1 = 16;  
+                }
+                //incréementer la valeur du compteur
+                Etape_Step_M1 --;
+                //modifier l'etat des pin INA1, INB1 et INB2
+                Quarter_Step_M1(Etape_Step_M1);
+                //moifier la valeur des port de I/O expender (controler via I2C))
+                I2C_Write_Data_PCA95(ID_I2C_M(Moteur_1), Quarter_Step_Positif[Etape_Step_M1]);
+                
+                //si la valeur de  Val_HalfStep est supérieur au égale à 16
+                //le moteur à fait un step complet
+                if (Etape_Step_M1 <= 0)
+                {
+                    Nbr_Step_M1 ++;
+                }  
+            
+            }
+            else
+            {
+                MAX_Step = 1;
+                //mettre la valeur du compteur à 0
+                Nbr_Step_M1 = 1;
+                //Changer d'état (faire tourner le moteur M2)
+                Val_Mode_Moteur_RL = STATE_MOTEUR_M2;
+            }
+            
+            
+        break;   
+    
+    }
 }
 
 //---------------------------------------------------------------------------------	
@@ -256,7 +581,76 @@ void Mode_Retour_Lent(void)
 
 void Mode_Rembobinage(void)
 {
+
+    //Déclatation de varable local 
+    //Initaliser la machine d'état en static en mode STATE_MOTEUR_M3
+    static STATES_MODE_Moteur Val_Mode_Moteur_RL = STATE_MOTEUR_M1;
+
+
+    //valeur pour init de la structure
+    static uint8_t Etape_Step_M1 = 16;
+
+    static uint8_t Etape_Step_M3 = 16;
     
+    
+    switch(Val_Mode_Moteur_RL)
+    {
+        case STATE_MOTEUR_M3:
+            //Si le capteur de fin course du haut est actif 
+            if(FinCourse_DownStateGet())
+            {
+                //Changer d'état (faire tourner le moteur M2)
+                Val_Mode_Moteur_RL = STATE_MOTEUR_M1;
+
+            }
+            //sinon faire tourner le moteur 
+            else 
+            {
+                if ( Etape_Step_M3 == 0)
+                {
+                    //incréementer la valeur du compteur
+                    Etape_Step_M3 = 16;  
+                }
+                //incréementer la valeur du compteur
+                Etape_Step_M3 --;
+                //modifier l'etat des pin INA1, INB1 et INB2
+                Quarter_Step_M3(Etape_Step_M1);
+                //moifier la valeur des port de I/O expender (controler via I2C))
+                I2C_Write_Data_PCA95(ID_I2C_M(Moteur_3), Quarter_Step_Positif[Etape_Step_M3]);
+                        
+            }
+        break;
+        
+        
+        case STATE_MOTEUR_M1:
+            //Si le moteur 1 à avance de moins de 4 step
+            if (FinCourse_UpStateGet() != 1)
+            {
+                if ( Etape_Step_M1 == 0)
+                {
+                    //incréementer la valeur du compteur
+                    Etape_Step_M1 = 16;  
+                }
+                //incréementer la valeur du compteur
+                Etape_Step_M1 --;
+                //modifier l'etat des pin INA1, INB1 et INB2
+                Quarter_Step_M1(Etape_Step_M1);
+                //moifier la valeur des port de I/O expender (controler via I2C))
+                I2C_Write_Data_PCA95(ID_I2C_M(Moteur_1), Quarter_Step_Positif[Etape_Step_M1]);
+                
+                 
+            
+            }
+            else
+            {
+                //Changer d'état (faire tourner le moteur M3)
+                Val_Mode_Moteur_RL = STATE_MOTEUR_M3;
+            }
+            
+            
+        break;   
+    
+    }
 }
 //---------------------------------------------------------------------------------	
 // Fonction OnOff_VentilETLED

@@ -17,9 +17,6 @@
 #include "peripheral\i2c\plib_i2c.h"
 #include "peripheral\osc\plib_osc.h"
 
-//declaration de la valeur des tableaux
-uint8_t Step_Positif[4] = {0x46, 0x44, 0x40, 0x42}; //moteur tourne dans le sens horaire
-uint8_t Step_Negatif[4] = {0x42, 0x40, 0x44, 0x46};//moteur tourne dans le sens anti-horaire
 
 //---------------------------------------------------------------------------------	
 // Fonction I2C_INITMOTEUR
@@ -55,6 +52,7 @@ void I2C_WriteConfigPCA95( uint32_t ID)
     {
         i2c_write(PCA9538A_OutputInitValue_M2, ID);	// data to port
     }
+
     else
     {
         i2c_write(PCA9538A_OutputInitValue, ID);	// data to port
